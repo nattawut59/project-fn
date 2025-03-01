@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>จัดการเวร - Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Flatpickr (Date Picker) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Search & Filter Bar */
+        .search-filter-bar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .custom-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .custom-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        .search-input {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        /* Card Styles */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .content-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.ot {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.normal {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-badge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Custom Button */
+        .btn-custom {
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-custom-primary {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+        }
+
+        .btn-custom-primary:hover {
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn-edit {
+            background-color: #e7f3ff;
+            color: #0d6efd;
+        }
+
+        .action-btn-delete {
+            background-color: #ffe7e7;
+            color: #dc3545;
+        }
+
+        .action-btn-view {
+            background-color: #e7fff3;
+            color: #198754;
+        }
+
+        /* Modal Styles */
+        .custom-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-modal .modal-header {
+            background: var(--primary-gradient);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            color: white;
+            border-bottom: none;
+        }
+
+        .custom-modal .modal-title {
+            font-weight: 600;
+        }
+
+        .custom-modal .modal-footer {
+            border-top: none;
+            padding: 15px 20px;
+        }
+
+        .custom-modal .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .custom-modal .form-control,
+        .custom-modal .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .custom-modal .form-control:focus,
+        .custom-modal .form-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Float Button */
+        .btn-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1030;
+            transition: all 0.3s;
+        }
+
+        .btn-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-filter-bar {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-navbar .page-title {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-management.html" class="active hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="overtime.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-requests.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="users.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="departments.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="report-monthly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="report-yearly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">จัดการเวร</h3>
+            <div class="d-flex align-items-center">
+                <div class="month-selector me-4">
+                    <select class="custom-select" id="monthSelector" onchange="loadShifts()">
+                        <option value="มกราคม 2025">มกราคม 2025</option>
+                        <option value="กุมภาพันธ์ 2025">กุมภาพันธ์ 2025</option>
+                        <option value="มีนาคม 2025">มีนาคม 2025</option>
+                        <option value="เมษายน 2025">เมษายน 2025</option>
+                        <option value="พฤษภาคม 2025">พฤษภาคม 2025</option>
+                        <option value="มิถุนายน 2025">มิถุนายน 2025</option>
+                        <option value="กรกฎาคม 2025">กรกฎาคม 2025</option>
+                        <option value="สิงหาคม 2025">สิงหาคม 2025</option>
+                        <option value="กันยายน 2025">กันยายน 2025</option>
+                        <option value="ตุลาคม 2025">ตุลาคม 2025</option>
+                        <option value="พฤศจิกายน 2025">พฤศจิกายน 2025</option>
+                        <option value="ธันวาคม 2025">ธันวาคม 2025</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ค้นหาชื่อบุคลากร..." onkeyup="filterShifts()">
+                </div>
+                <div class="col-md-3">
+                    <select class="custom-select" id="departmentFilter" onchange="filterShifts()">
+                        <option value="">ทุกแผนก</option>
+                        <!-- แผนกจะถูกโหลดด้วย JavaScript -->
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="custom-select" id="roleFilter" onchange="filterShifts()">
+                        <option value="">ทั้งหมด</option>
+                        <option value="Doctor">แพทย์</option>
+                        <option value="Nurse">พยาบาล</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-custom btn-custom-primary w-100" onclick="openAddShiftModal()">
+                        <i class="fas fa-plus me-2"></i> เพิ่มเวรใหม่
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shifts Table Card -->
+        <div class="content-card">
+            <div class="card-title">
+                <span>ตารางเวร</span>
+            </div>
+            <div class="table-responsive">
+                <table class="custom-table" id="shiftsTable">
+                    <thead>
+                        <tr>
+                            <th>ชื่อ</th>
+                            <th>แผนก</th>
+                            <th>ตำแหน่ง</th>
+                            <th>วันที่</th>
+                            <th>เวลาเริ่ม</th>
+                            <th>เวลาสิ้นสุด</th>
+                            <th>สถานะ</th>
+                            <th>การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftsTableBody">
+                        <!-- ข้อมูลจะถูกโหลดด้วย JavaScript -->
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>กำลังโหลดข้อมูล...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Shift Modal -->
+    <div class="modal fade custom-modal" id="shiftModal" tabindex="-1" aria-labelledby="shiftModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shiftModalLabel">เพิ่มเวรใหม่</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="shiftForm">
+                        <input type="hidden" id="shiftId">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="userSelect" class="form-label">บุคลากร</label>
+                                <select class="form-select" id="userSelect" required>
+                                    <option value="">เลือกบุคลากร</option>
+                                    <!-- ผู้ใช้จะถูกโหลดด้วย JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="shiftDate" class="form-label">วันที่</label>
+                                <input type="date" class="form-control" id="shiftDate" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startTime" class="form-label">เวลาเริ่ม</label>
+                                <div class="time-select-container">
+                                    <input type="time" class="form-control time-input" id="startTime" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endTime" class="form-label">เวลาสิ้นสุด</label>
+                                <div class="time-select-container">
+                                    <input type="time" class="form-control time-input" id="endTime" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isOvertimeCheck">
+                            <label class="form-check-label" for="isOvertimeCheck">
+                                ทำงานล่วงเวลา (OT)
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="saveShiftBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade custom-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ยืนยันการลบ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>คุณแน่ใจหรือไม่ว่าต้องการลบเวรนี้?</p>
+                    <p>การกระทำนี้ไม่สามารถเรียกคืนได้</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Shift Details Modal -->
+    <div class="modal fade custom-modal" id="viewShiftModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">รายละเอียดเวร</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">ชื่อบุคลากร:</div>
+                        <div class="col-7" id="viewName"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">แผนก:</div>
+                        <div class="col-7" id="viewDepartment"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">ตำแหน่ง:</div>
+                        <div class="col-7" id="viewRole"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">วันที่:</div>
+                        <div class="col-7" id="viewDate"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">เวลาเริ่ม:</div>
+                        <div class="col-7" id="viewStartTime"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">เวลาสิ้นสุด:</div>
+                        <div class="col-7" id="viewEndTime"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">สถานะ:</div>
+                        <div class="col-7" id="viewStatus"></div>
+                    </div>
+                    <div class="row mb-2" id="otDetailsRow" style="display: none;">
+                        <div class="col-5 fw-bold">ชั่วโมง OT:</div>
+                        <div class="col-7" id="viewOTHours"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Float Button -->
+    <button class="btn btn-float bg-primary text-white" onclick="openAddShiftModal()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Custom JS -->
+    <script>
+        // ตัวแปรสำหรับเก็บค่า modal และข้อมูล
+        const API_BASE_URL = 'http://localhost:3000';
+        let shiftsData = [];
+        let departmentsData = [];
+        let usersData = [];
+        let shiftModal;
+        let deleteConfirmModal;
+        let viewShiftModal;
+        let selectedShiftId = null;
+        
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // สร้าง Modal objects
+            shiftModal = new bootstrap.Modal(document.getElementById('shiftModal'));
+            deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            viewShiftModal = new bootstrap.Modal(document.getElementById('viewShiftModal'));
+            
+            // ตั้งค่า flatpickr สำหรับ input เวลา
+            setupTimePickers();
+            
+            // โหลดข้อมูลตั้งต้น
+            loadDepartments();
+            loadUsers();
+            loadShifts();
+            
+            // เพิ่ม event listeners
+            document.getElementById('saveShiftBtn').addEventListener('click', saveShift);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteShift);
+        });
+        
+        // ตั้งค่าตัวเลือกเวลาแบบกำหนดเอง
+        function setupTimePickers() {
+            // ใช้ flatpickr สำหรับ input เวลาเพื่อให้เลือกได้ง่ายขึ้น
+            flatpickr('#startTime', {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: 'H:i',
+                time_24hr: true,
+                minuteIncrement: 30,
+                defaultHour: 8,
+                defaultMinute: 0,
+                disableMobile: true, // สำคัญมากสำหรับป้องกันปัญหาบนมือถือ
+                // เพิ่มความสูงให้กับ dropdown
+                onOpen: function(selectedDates, dateStr, instance) {
+                    instance.calendarContainer.style.maxHeight = '300px';
+                    instance.calendarContainer.style.overflowY = 'auto';
+                }
+            });
+            
+            flatpickr('#endTime', {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: 'H:i',
+                time_24hr: true,
+                minuteIncrement: 30,
+                defaultHour: 16,
+                defaultMinute: 0,
+                disableMobile: true, // สำคัญมากสำหรับป้องกันปัญหาบนมือถือ
+                // เพิ่มความสูงให้กับ dropdown
+                onOpen: function(selectedDates, dateStr, instance) {
+                    instance.calendarContainer.style.maxHeight = '300px';
+                    instance.calendarContainer.style.overflowY = 'auto';
+                }
+            });
+        }
+        
+        // โหลดข้อมูลแผนก
+        async function loadDepartments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getDepartments`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลแผนกได้');
+                
+                departmentsData = await response.json();
+                
+                // เพิ่มตัวเลือกแผนกลงใน dropdown
+                const departmentFilter = document.getElementById('departmentFilter');
+                departmentsData.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.dept_id;
+                    option.textContent = dept.dept_name;
+                    departmentFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลแผนก:', error);
+                alert('ไม่สามารถโหลดข้อมูลแผนกได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // โหลดข้อมูลผู้ใช้ (แพทย์และพยาบาล)
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getUsers`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลบุคลากรได้');
+                
+                usersData = await response.json();
+                
+                // เพิ่มตัวเลือกผู้ใช้ลงใน dropdown
+                const userSelect = document.getElementById('userSelect');
+                userSelect.innerHTML = '<option value="">เลือกบุคลากร</option>';
+                
+                // แยกผู้ใช้ตามประเภท
+                const doctors = usersData.filter(user => user.role === 'Doctor');
+                const nurses = usersData.filter(user => user.role === 'Nurse');
+                
+                // สร้าง optgroup สำหรับแพทย์
+                if (doctors.length > 0) {
+                    const doctorGroup = document.createElement('optgroup');
+                    doctorGroup.label = 'แพทย์';
+                    doctors.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.user_id;
+                        option.textContent = doctor.name;
+                        doctorGroup.appendChild(option);
+                    });
+                    userSelect.appendChild(doctorGroup);
+                }
+                
+                // สร้าง optgroup สำหรับพยาบาล
+                if (nurses.length > 0) {
+                    const nurseGroup = document.createElement('optgroup');
+                    nurseGroup.label = 'พยาบาล';
+                    nurses.forEach(nurse => {
+                        const option = document.createElement('option');
+                        option.value = nurse.user_id;
+                        option.textContent = nurse.name;
+                        nurseGroup.appendChild(option);
+                    });
+                    userSelect.appendChild(nurseGroup);
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลบุคลากร:', error);
+                alert('ไม่สามารถโหลดข้อมูลบุคลากรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // โหลดข้อมูลเวร
+        async function loadShifts() {
+            try {
+                const selectedMonth = document.getElementById('monthSelector').value;
+                let startDate, endDate;
+                
+                // แปลงชื่อเดือนไทยเป็นวันที่
+                switch (selectedMonth) {
+                    case 'มกราคม ':
+                        startDate = '2025-01-01';
+                        endDate = '2025-01-31';
+                        break;
+                    case 'กุมภาพันธ์ ':
+                        startDate = '2025-02-01';
+                        endDate = '2025-02-28';
+                        break;
+                    case 'มีนาคม ':
+                        startDate = '2025-03-01';
+                        endDate = '2025-03-31';
+                        break;
+                    case 'เมษายน ':
+                        startDate = '2025-04-01';
+                        endDate = '2025-04-30';
+                        break;
+                    case 'พฤษภาคม ':
+                        startDate = '2025-05-01';
+                        endDate = '2025-05-31';
+                        break;
+                    case 'มิถุนายน ':
+                        startDate = '2025-06-01';
+                        endDate = '2025-06-30';
+                        break;
+                    case 'กรกฎาคม ':
+                        startDate = '2025-07-01';
+                        endDate = '2025-07-31';
+                        break;
+                    case 'สิงหาคม ':
+                        startDate = '2025-08-01';
+                        endDate = '2025-08-31';
+                        break;
+                    case 'กันยายน ':
+                        startDate = '2025-09-01';
+                        endDate = '2025-09-30';
+                        break;
+                    case 'ตุลาคม ':
+                        startDate = '2025-10-01';
+                        endDate = '2025-10-31';
+                        break;
+                    case 'พฤศจิกายน ':
+                        startDate = '2025-11-01';
+                        endDate = '2025-11-30';
+                        break;
+                    case 'ธันวาคม ':
+                        startDate = '2025-12-01';
+                        endDate = '2025-12-31';
+                        break;
+                    default:
+                        startDate = '2025-01-01';
+                        endDate = '2025-01-31';
+                }
+                
+                // แสดง loading
+                document.getElementById('shiftsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="loading-spinner"></div>
+                            <p>กำลังโหลดข้อมูล...</p>
+                        </td>
+                    </tr>
+                `;
+                
+                // เรียก API เพื่อดึงข้อมูลเวร
+                const response = await fetch(`${API_BASE_URL}/getShifts`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลเวรได้');
+                
+                const allShifts = await response.json();
+                
+                // กรองเฉพาะเวรในเดือนที่เลือก
+                shiftsData = allShifts.filter(shift => {
+                    const shiftDate = new Date(shift.shift_date);
+                    const startDateObj = new Date(startDate);
+                    const endDateObj = new Date(endDate);
+                    return shiftDate >= startDateObj && shiftDate <= endDateObj;
+                });
+                
+                // แสดงข้อมูลเวร
+                displayShifts(shiftsData);
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลเวร:', error);
+                document.getElementById('shiftsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i> ไม่สามารถโหลดข้อมูลเวรได้ กรุณาลองใหม่อีกครั้ง
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // แสดงข้อมูลเวรในตาราง
+        function displayShifts(shifts) {
+            const tbody = document.getElementById('shiftsTableBody');
+            
+            if (shifts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูลเวรในช่วงเวลานี้
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            shifts.forEach(shift => {
+                const tr = document.createElement('tr');
+                
+                // จัดรูปแบบวันที่
+                const shiftDate = new Date(shift.shift_date);
+                const formattedDate = shiftDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // จัดรูปแบบเวลา
+                const startTime = shift.start_time.substring(0, 5);
+                const endTime = shift.end_time.substring(0, 5);
+                
+                // สถานะ OT หรือปกติ
+                const statusBadge = shift.is_overtime 
+                    ? '<span class="status-badge ot">OT</span>' 
+                    : '<span class="status-badge normal">ปกติ</span>';
+                
+                // แปลงตำแหน่งเป็นภาษาไทย
+                const roleThai = shift.role === 'Doctor' ? 'แพทย์' : 'พยาบาล';
+                
+                tr.innerHTML = `
+                    <td>${shift.name}</td>
+                    <td>${shift.dept_name || '-'}</td>
+                    <td>${roleThai}</td>
+                    <td>${formattedDate}</td>
+                    <td>${startTime}</td>
+                    <td>${endTime}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn action-btn action-btn-view" onclick="viewShiftDetails(${shift.shift_id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn action-btn action-btn-edit" onclick="openEditShiftModal(${shift.shift_id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn action-btn action-btn-delete" onclick="confirmDeleteShift(${shift.shift_id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // กรองข้อมูลเวร
+        function filterShifts() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const departmentId = document.getElementById('departmentFilter').value;
+            const role = document.getElementById('roleFilter').value;
+            
+            let filteredShifts = shiftsData;
+            
+            // กรองตามข้อความค้นหา
+            if (searchText) {
+                filteredShifts = filteredShifts.filter(shift => 
+                    shift.name.toLowerCase().includes(searchText)
+                );
+            }
+            
+            // กรองตามแผนก
+            if (departmentId) {
+                filteredShifts = filteredShifts.filter(shift => 
+                    shift.dept_id == departmentId
+                );
+            }
+            
+            // กรองตามตำแหน่ง
+            if (role) {
+                filteredShifts = filteredShifts.filter(shift => 
+                    shift.role === role
+                );
+            }
+            
+            // แสดงผลลัพธ์
+            displayShifts(filteredShifts);
+        }
+        
+        // เปิด Modal เพิ่มเวรใหม่
+        function openAddShiftModal() {
+            // ล้างค่าฟอร์ม
+            document.getElementById('shiftId').value = '';
+            document.getElementById('userSelect').value = '';
+            document.getElementById('shiftDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('isOvertimeCheck').checked = false;
+            
+            // เปลี่ยนชื่อ Modal
+            document.getElementById('shiftModalLabel').textContent = 'เพิ่มเวรใหม่';
+            
+            // แสดง Modal
+            shiftModal.show();
+        }
+        
+        // เปิด Modal แก้ไขเวร
+        async function openEditShiftModal(shiftId) {
+            try {
+                // เก็บ ID เวรที่กำลังแก้ไข
+                selectedShiftId = shiftId;
+                
+                // ดึงข้อมูลเวรตาม ID
+                const response = await fetch(`${API_BASE_URL}/getShiftById/${shiftId}`);
+                if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลเวรได้');
+                
+                const shift = await response.json();
+                
+                // กำหนดค่าให้ฟอร์ม
+                document.getElementById('shiftId').value = shift.shift_id;
+                document.getElementById('userSelect').value = shift.user_id;
+                document.getElementById('shiftDate').value = shift.shift_date.split('T')[0];
+                document.getElementById('startTime').value = shift.start_time.substring(0, 5);
+                document.getElementById('endTime').value = shift.end_time.substring(0, 5);
+                document.getElementById('isOvertimeCheck').checked = shift.is_overtime;
+                
+                // เปลี่ยนชื่อ Modal
+                document.getElementById('shiftModalLabel').textContent = 'แก้ไขเวร';
+                
+                // แสดง Modal
+                shiftModal.show();
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลเวร:', error);
+                alert('ไม่สามารถดึงข้อมูลเวรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // บันทึกข้อมูลเวร (เพิ่มใหม่หรือแก้ไข)
+        async function saveShift() {
+            try {
+                // ดึงข้อมูลจากฟอร์ม
+                const shiftId = document.getElementById('shiftId').value;
+                const userId = document.getElementById('userSelect').value;
+                const shiftDate = document.getElementById('shiftDate').value;
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+                const isOvertime = document.getElementById('isOvertimeCheck').checked;
+                
+                // ตรวจสอบข้อมูล
+                if (!userId || !shiftDate || !startTime || !endTime) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+                
+                // สร้างข้อมูลสำหรับส่งไป API
+                const shiftData = {
+                    user_id: userId,
+                    shift_date: shiftDate,
+                    start_time: startTime,
+                    end_time: endTime,
+                    is_overtime: isOvertime
+                };
+                
+                // กำหนด API URL และ method ตามการเพิ่มหรือแก้ไข
+                let url, method;
+                if (shiftId) {
+                    // แก้ไขเวร
+                    url = `${API_BASE_URL}/updateShift`;
+                    method = 'PUT';
+                    shiftData.shift_id = shiftId;
+                } else {
+                    // เพิ่มเวรใหม่
+                    url = `${API_BASE_URL}/addShift`;
+                    method = 'POST';
+                }
+                
+                // ส่งข้อมูลไป API
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(shiftData)
+                });
+                
+                if (!response.ok) throw new Error('ไม่สามารถบันทึกข้อมูลเวรได้');
+                
+                const result = await response.json();
+                
+                // ปิด Modal
+                shiftModal.hide();
+                
+                // โหลดข้อมูลเวรใหม่
+                loadShifts();
+                
+                // แสดงข้อความสำเร็จ
+                alert(shiftId ? 'แก้ไขเวรเรียบร้อย' : 'เพิ่มเวรเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลเวร:', error);
+                alert('ไม่สามารถบันทึกข้อมูลเวรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // ยืนยันการลบเวร
+        function confirmDeleteShift(shiftId) {
+            selectedShiftId = shiftId;
+            deleteConfirmModal.show();
+        }
+        
+        // ลบเวร
+        async function deleteShift() {
+            try {
+                if (!selectedShiftId) {
+                    deleteConfirmModal.hide();
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/deleteShift/${selectedShiftId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('ไม่สามารถลบเวรได้');
+                
+                // ปิด Modal
+                deleteConfirmModal.hide();
+                
+                // โหลดข้อมูลเวรใหม่
+                loadShifts();
+                
+                // แสดงข้อความสำเร็จ
+                alert('ลบเวรเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการลบเวร:', error);
+                alert('ไม่สามารถลบเวรได้ กรุณาลองใหม่อีกครั้ง');
+                deleteConfirmModal.hide();
+            }
+        }
+        
+        // ดูรายละเอียดเวร
+        async function viewShiftDetails(shiftId) {
+            try {
+                // ดึงข้อมูลเวรตาม ID
+                const response = await fetch(`${API_BASE_URL}/getShiftById/${shiftId}`);
+                if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลเวรได้');
+                
+                const shift = await response.json();
+                
+                // จัดรูปแบบวันที่
+                const shiftDate = new Date(shift.shift_date);
+                const formattedDate = shiftDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // จัดรูปแบบเวลา
+                const startTime = shift.start_time.substring(0, 5);
+                const endTime = shift.end_time.substring(0, 5);
+                
+                // สถานะ OT หรือปกติ
+                const status = shift.is_overtime ? 'ล่วงเวลา (OT)' : 'ปกติ';
+                
+                // แปลงตำแหน่งเป็นภาษาไทย
+                const roleThai = shift.role === 'Doctor' ? 'แพทย์' : 'พยาบาล';
+                
+                // กำหนดค่าให้ Modal
+                document.getElementById('viewName').textContent = shift.name;
+                document.getElementById('viewDepartment').textContent = shift.dept_name || '-';
+                document.getElementById('viewRole').textContent = roleThai;
+                document.getElementById('viewDate').textContent = formattedDate;
+                document.getElementById('viewStartTime').textContent = startTime;
+                document.getElementById('viewEndTime').textContent = endTime;
+                document.getElementById('viewStatus').textContent = status;
+                
+                // ถ้าเป็น OT ให้แสดงชั่วโมง OT
+                if (shift.is_overtime) {
+                    // ดึงข้อมูล OT ถ้ามี
+                    try {
+                        const otResponse = await fetch(`${API_BASE_URL}/getOvertimeById/${shift.shift_id}`);
+                        if (otResponse.ok) {
+                            const otData = await otResponse.json();
+                            document.getElementById('viewOTHours').textContent = `${otData.hours} ชั่วโมง`;
+                            document.getElementById('otDetailsRow').style.display = 'flex';
+                        } else {
+                            document.getElementById('otDetailsRow').style.display = 'none';
+                        }
+                    } catch (error) {
+                        document.getElementById('otDetailsRow').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('otDetailsRow').style.display = 'none';
+                }
+                
+                // แสดง Modal
+                viewShiftModal.show();
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลเวร:', error);
+                alert('ไม่สามารถดึงข้อมูลเวรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+    </script>
+</body>
+
+</html>

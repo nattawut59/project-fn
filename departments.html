@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>จัดการแผนก - Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Search & Filter Bar */
+        .search-filter-bar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .content-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Department Cards */
+        .department-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .department-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .department-card-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .department-card-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .department-card-body {
+            padding: 20px;
+        }
+
+        .department-card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .department-card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn-edit {
+            background-color: #e7f3ff;
+            color: #0d6efd;
+        }
+
+        .action-btn-delete {
+            background-color: #ffe7e7;
+            color: #dc3545;
+        }
+
+        /* Tab Styles */
+        .tabs {
+            margin-bottom: 20px;
+        }
+
+        .tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+
+        .tabs .nav-link.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+        }
+
+        /* Modal Styles */
+        .custom-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-modal .modal-header {
+            background: var(--primary-gradient);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            color: white;
+            border-bottom: none;
+        }
+
+        .custom-modal .modal-title {
+            font-weight: 600;
+        }
+
+        .custom-modal .modal-footer {
+            border-top: none;
+            padding: 15px 20px;
+        }
+
+        .custom-modal .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .custom-modal .form-control {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .custom-modal .form-control:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Float Button */
+        .btn-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1030;
+            transition: all 0.3s;
+        }
+
+        .btn-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-submessage {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* Custom Button */
+        .btn-custom {
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-custom-primary {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+        }
+
+        .btn-custom-primary:hover {
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .department-cards {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-filter-bar {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-navbar .page-title {
+                margin-bottom: 10px;
+            }
+
+            .tabs .nav-link {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .department-card-actions {
+                flex-direction: column;
+            }
+
+            .department-card-actions .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-management.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="overtime.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-requests.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="users.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="departments.html" class="active hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="report-monthly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="report-yearly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">จัดการแผนก</h3>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-custom btn-custom-primary" onclick="openAddDepartmentModal()">
+                    <i class="fas fa-plus me-2"></i> เพิ่มแผนกใหม่
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-filter-bar animate__animated animate__fadeInUp">
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ค้นหาชื่อแผนก..." onkeyup="filterDepartments()">
+                </div>
+            </div>
+        </div>
+
+        <!-- View Tabs -->
+        <ul class="nav nav-pills tabs animate__animated animate__fadeInUp" style="animation-delay: 0.1s;" id="departmentViewTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="cards-tab" data-bs-toggle="tab" data-bs-target="#cards-view" type="button" role="tab" aria-controls="cards-view" aria-selected="true">
+                    <i class="fas fa-th-large me-2"></i> แบบการ์ด
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-view" type="button" role="tab" aria-controls="table-view" aria-selected="false">
+                    <i class="fas fa-table me-2"></i> แบบตาราง
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="departmentViewTabContent">
+            <!-- Cards View Tab -->
+            <div class="tab-pane fade show active" id="cards-view" role="tabpanel" aria-labelledby="cards-tab">
+                <div class="department-cards animate__animated animate__fadeInUp" style="animation-delay: 0.2s;" id="departmentCardsContainer">
+                    <!-- ข้อมูลจะถูกโหลดด้วย JavaScript -->
+                    <div class="text-center p-5 w-100">
+                        <div class="loading-spinner"></div>
+                        <p class="mt-3">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table View Tab -->
+            <div class="tab-pane fade" id="table-view" role="tabpanel" aria-labelledby="table-tab">
+                <div class="content-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="table-responsive">
+                        <table class="custom-table" id="departmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>รหัสแผนก</th>
+                                    <th>ชื่อแผนก</th>
+                                    <th>จำนวนบุคลากร</th>
+                                    <th>วันที่สร้าง</th>
+                                    <th>การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departmentsTableBody">
+                                <!-- ข้อมูลจะถูกโหลดด้วย JavaScript -->
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="loading-spinner"></div>
+                                        <p>กำลังโหลดข้อมูล...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Department Modal -->
+    <div class="modal fade custom-modal" id="departmentModal" tabindex="-1" aria-labelledby="departmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="departmentModalLabel">เพิ่มแผนกใหม่</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="departmentForm">
+                        <input type="hidden" id="departmentId">
+                        <div class="mb-3">
+                            <label for="departmentName" class="form-label">ชื่อแผนก</label>
+                            <input type="text" class="form-control" id="departmentName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="saveDepartmentBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Department Modal -->
+    <div class="modal fade custom-modal" id="deleteDepartmentModal" tabindex="-1" aria-labelledby="deleteDepartmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDepartmentModalLabel">ยืนยันการลบแผนก</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="deleteDepartmentId">
+                    <p>คุณแน่ใจหรือไม่ว่าต้องการลบแผนกนี้?</p>
+                    <p class="text-danger">หมายเหตุ: การลบแผนกจะทำให้ข้อมูลแผนกในบุคลากรเป็นค่าว่าง แต่จะไม่ลบบุคลากรที่อยู่ในแผนก</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Float Button -->
+    <button class="btn btn-float bg-primary text-white" onclick="openAddDepartmentModal()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // ตัวแปรสำหรับเก็บข้อมูล
+        const API_BASE_URL = 'http://localhost:3000';
+        let departmentsData = [];
+        let usersData = [];
+        let departmentModal;
+        let deleteDepartmentModal;
+        
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // สร้าง Modal objects
+            departmentModal = new bootstrap.Modal(document.getElementById('departmentModal'));
+            deleteDepartmentModal = new bootstrap.Modal(document.getElementById('deleteDepartmentModal'));
+            
+            // เพิ่ม event listeners
+            document.getElementById('saveDepartmentBtn').addEventListener('click', saveDepartment);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteDepartment);
+            
+            // โหลดข้อมูลตั้งต้น
+            loadDepartments();
+            loadUsers();
+            updatePendingRequestsCount();
+        });
+        
+        // โหลดข้อมูลแผนก
+        async function loadDepartments() {
+            try {
+                // แสดง loading
+                document.getElementById('departmentCardsContainer').innerHTML = `
+                    <div class="text-center p-5 w-100">
+                        <div class="loading-spinner"></div>
+                        <p class="mt-3">กำลังโหลดข้อมูล...</p>
+                    </div>
+                `;
+                
+                document.getElementById('departmentsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <div class="loading-spinner"></div>
+                            <p>กำลังโหลดข้อมูล...</p>
+                        </td>
+                    </tr>
+                `;
+                
+                const response = await fetch(`${API_BASE_URL}/getDepartments`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลแผนกได้');
+                
+                departmentsData = await response.json();
+                
+                // แสดงข้อมูลแผนก
+                displayDepartmentsCards();
+                displayDepartmentsTable();
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลแผนก:', error);
+                
+                document.getElementById('departmentCardsContainer').innerHTML = `
+                    <div class="empty-state w-100">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="empty-state-message">ไม่สามารถโหลดข้อมูลแผนกได้</div>
+                        <div class="empty-state-submessage">โปรดลองใหม่อีกครั้งหรือติดต่อผู้ดูแลระบบ</div>
+                        <button class="btn btn-primary" onclick="loadDepartments()">ลองใหม่</button>
+                    </div>
+                `;
+                
+                document.getElementById('departmentsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i> ไม่สามารถโหลดข้อมูลแผนกได้ กรุณาลองใหม่อีกครั้ง
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // โหลดข้อมูลบุคลากร (เพื่อนับจำนวนบุคลากรในแต่ละแผนก)
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getUsers`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลบุคลากรได้');
+                
+                usersData = await response.json();
+                
+                // อัพเดตจำนวนบุคลากรในแผนก
+                if (departmentsData.length > 0) {
+                    displayDepartmentsCards();
+                    displayDepartmentsTable();
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลบุคลากร:', error);
+            }
+        }
+        
+        // แสดงข้อมูลแผนกในรูปแบบการ์ด
+        function displayDepartmentsCards() {
+            const container = document.getElementById('departmentCardsContainer');
+            
+            if (departmentsData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state w-100">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="empty-state-message">ไม่พบข้อมูลแผนก</div>
+                        <div class="empty-state-submessage">กดปุ่ม "เพิ่มแผนกใหม่" เพื่อเริ่มสร้างแผนก</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            departmentsData.forEach(dept => {
+                // นับจำนวนบุคลากรในแผนก
+                const staffCount = usersData.filter(user => user.dept_id == dept.dept_id).length;
+                
+                // นับจำนวนแพทย์ในแผนก
+                const doctorCount = usersData.filter(user => user.dept_id == dept.dept_id && user.role === 'Doctor').length;
+                
+                // นับจำนวนพยาบาลในแผนก
+                const nurseCount = usersData.filter(user => user.dept_id == dept.dept_id && user.role === 'Nurse').length;
+                
+                // จัดรูปแบบวันที่สร้าง
+                const createdDate = new Date(dept.createdAt);
+                const formattedDate = createdDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // สร้างการ์ด
+                const card = document.createElement('div');
+                card.className = 'department-card animate__animated animate__fadeIn';
+                card.innerHTML = `
+                    <div class="department-card-header">
+                        <h3>${dept.dept_name}</h3>
+                    </div>
+                    <div class="department-card-body">
+                        <div class="department-card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${staffCount}</div>
+                                <div class="stat-label">บุคลากรทั้งหมด</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${doctorCount}</div>
+                                <div class="stat-label">แพทย์</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${nurseCount}</div>
+                                <div class="stat-label">พยาบาล</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${formattedDate}</div>
+                                <div class="stat-label">วันที่สร้าง</div>
+                            </div>
+                        </div>
+                        <div class="department-card-actions">
+                            <button class="btn btn-sm btn-outline-success" onclick="openEditDepartmentModal(${dept.dept_id})">
+                                <i class="fas fa-edit me-1"></i> แก้ไข
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDepartment(${dept.dept_id})">
+                                <i class="fas fa-trash me-1"></i> ลบ
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // แสดงข้อมูลแผนกในตาราง
+        function displayDepartmentsTable() {
+            const tbody = document.getElementById('departmentsTableBody');
+            
+            if (departmentsData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูลแผนก
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            departmentsData.forEach(dept => {
+                const tr = document.createElement('tr');
+                
+                // นับจำนวนบุคลากรในแผนก
+                const staffCount = usersData.filter(user => user.dept_id == dept.dept_id).length;
+                
+                // จัดรูปแบบวันที่สร้าง
+                const createdDate = new Date(dept.createdAt);
+                const formattedDate = createdDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                tr.innerHTML = `
+                    <td>${dept.dept_id}</td>
+                    <td>${dept.dept_name}</td>
+                    <td>${staffCount}</td>
+                    <td>${formattedDate}</td>
+                    <td>
+                        <button class="btn action-btn action-btn-edit" onclick="openEditDepartmentModal(${dept.dept_id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn action-btn action-btn-delete" onclick="confirmDeleteDepartment(${dept.dept_id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // กรองข้อมูลแผนก
+        function filterDepartments() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            // กรองข้อมูล
+            const filteredDepartments = departmentsData.filter(dept => 
+                dept.dept_name.toLowerCase().includes(searchText)
+            );
+            
+            // ถ้าไม่มีข้อมูลแผนกที่กรองได้ ให้แสดงข้อความว่าไม่พบข้อมูล
+            const departmentCardsContainer = document.getElementById('departmentCardsContainer');
+            const departmentsTableBody = document.getElementById('departmentsTableBody');
+            
+            if (filteredDepartments.length === 0) {
+                departmentCardsContainer.innerHTML = `
+                    <div class="empty-state w-100">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="empty-state-message">ไม่พบข้อมูลแผนกที่ค้นหา</div>
+                        <div class="empty-state-submessage">ลองค้นหาด้วยคำอื่น หรือตรวจสอบการสะกดคำ</div>
+                    </div>
+                `;
+                
+                departmentsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <i class="fas fa-search me-2"></i> ไม่พบข้อมูลแผนกที่ค้นหา
+                        </td>
+                    </tr>
+                `;
+                
+                return;
+            }
+            
+            // แสดงผลลัพธ์
+            departmentsData = filteredDepartments;
+            displayDepartmentsCards();
+            displayDepartmentsTable();
+            
+            // คืนค่า departmentsData กลับเป็นค่าเดิม
+            loadDepartments();
+        }
+        
+        // เปิด Modal เพิ่มแผนกใหม่
+        function openAddDepartmentModal() {
+            // ล้างค่าฟอร์ม
+            document.getElementById('departmentForm').reset();
+            document.getElementById('departmentId').value = '';
+            
+            // เปลี่ยนชื่อ Modal
+            document.getElementById('departmentModalLabel').textContent = 'เพิ่มแผนกใหม่';
+            
+            // แสดง Modal
+            departmentModal.show();
+        }
+        
+        // เปิด Modal แก้ไขแผนก
+        function openEditDepartmentModal(deptId) {
+            // หาข้อมูลแผนกตาม ID
+            const department = departmentsData.find(dept => dept.dept_id == deptId);
+            if (!department) {
+                alert('ไม่พบข้อมูลแผนก');
+                return;
+            }
+            
+            // กำหนดค่าให้ฟอร์ม
+            document.getElementById('departmentId').value = department.dept_id;
+            document.getElementById('departmentName').value = department.dept_name;
+            
+            // เปลี่ยนชื่อ Modal
+            document.getElementById('departmentModalLabel').textContent = 'แก้ไขแผนก';
+            
+            // แสดง Modal
+            departmentModal.show();
+        }
+        
+        // ยืนยันการลบแผนก
+        function confirmDeleteDepartment(deptId) {
+            document.getElementById('deleteDepartmentId').value = deptId;
+            deleteDepartmentModal.show();
+        }
+        
+        // บันทึกข้อมูลแผนก (เพิ่มใหม่หรือแก้ไข)
+        async function saveDepartment() {
+            try {
+                // ดึงข้อมูลจากฟอร์ม
+                const deptId = document.getElementById('departmentId').value;
+                const deptName = document.getElementById('departmentName').value;
+                
+                // ตรวจสอบข้อมูล
+                if (!deptName) {
+                    alert('กรุณากรอกชื่อแผนก');
+                    return;
+                }
+                
+                // สร้างข้อมูลสำหรับส่งไป API
+                const deptData = {
+                    dept_name: deptName
+                };
+                
+                // กำหนด API URL และ method ตามการเพิ่มหรือแก้ไข
+                let url, method;
+                if (deptId) {
+                    // แก้ไขแผนก
+                    url = `${API_BASE_URL}/updateDepartment`;
+                    method = 'PUT';
+                    deptData.dept_id = deptId;
+                } else {
+                    // เพิ่มแผนกใหม่
+                    url = `${API_BASE_URL}/addDepartment`;
+                    method = 'POST';
+                }
+                
+                // ส่งข้อมูลไป API
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(deptData)
+                });
+                
+                if (!response.ok) throw new Error('ไม่สามารถบันทึกข้อมูลแผนกได้');
+                
+                // ปิด Modal
+                departmentModal.hide();
+                
+                // โหลดข้อมูลแผนกใหม่
+                loadDepartments();
+                
+                // แสดงข้อความสำเร็จ
+                alert(deptId ? 'แก้ไขข้อมูลแผนกเรียบร้อย' : 'เพิ่มแผนกเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลแผนก:', error);
+                alert('ไม่สามารถบันทึกข้อมูลแผนกได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // ลบแผนก
+        async function deleteDepartment() {
+            try {
+                const deptId = document.getElementById('deleteDepartmentId').value;
+                
+                if (!deptId) {
+                    deleteDepartmentModal.hide();
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/deleteDepartment/${deptId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('ไม่สามารถลบแผนกได้');
+                
+                // ปิด Modal
+                deleteDepartmentModal.hide();
+                
+                // โหลดข้อมูลแผนกใหม่
+                loadDepartments();
+                
+                // แสดงข้อความสำเร็จ
+                alert('ลบแผนกเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการลบแผนก:', error);
+                alert('ไม่สามารถลบแผนกได้ กรุณาลองใหม่อีกครั้ง');
+                deleteDepartmentModal.hide();
+            }
+        }
+        
+        // อัพเดตจำนวนคำขอเปลี่ยนเวรที่รอดำเนินการ
+        async function updatePendingRequestsCount() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอได้');
+                
+                const requests = await response.json();
+                
+                // นับจำนวนคำขอที่มีสถานะ 'Pending'
+                const pendingCount = requests.filter(req => req.status === 'Pending').length;
+                
+                // อัพเดต badge
+                const badge = document.getElementById('pendingRequestsCount');
+                badge.textContent = pendingCount;
+                
+                // ซ่อน badge ถ้าไม่มีคำขอที่รอดำเนินการ
+                if (pendingCount === 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลคำขอ:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

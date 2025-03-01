@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>คำขอเปลี่ยนเวร - Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Search & Filter Bar */
+        .search-filter-bar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .custom-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .custom-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        .search-input {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        /* Card Styles */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .content-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Request Card Styles */
+        .request-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .request-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .request-card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-card-header .request-id {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .request-card-header .request-status {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .request-card-header .request-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .request-card-header .request-status.approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .request-card-header .request-status.rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .request-card-body {
+            padding: 20px;
+        }
+
+        .request-card-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 15px;
+        }
+
+        .request-card-info-item {
+            margin-bottom: 10px;
+        }
+
+        .request-card-info-label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .request-card-info-value {
+            font-weight: 500;
+        }
+
+        .request-card-reason {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #dee2e6;
+        }
+
+        .request-card-reason-label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .request-card-actions {
+            padding: 15px 20px;
+            border-top: 1px solid #f0f0f0;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Modal Styles */
+        .custom-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-modal .modal-header {
+            background: var(--primary-gradient);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            color: white;
+            border-bottom: none;
+        }
+
+        .custom-modal .modal-title {
+            font-weight: 600;
+        }
+
+        .custom-modal .modal-footer {
+            border-top: none;
+            padding: 15px 20px;
+        }
+
+        .custom-modal .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .custom-modal .form-control,
+        .custom-modal .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .custom-modal .form-control:focus,
+        .custom-modal .form-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-submessage {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Float Button */
+        .btn-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1030;
+            transition: all 0.3s;
+        }
+
+        .btn-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .request-card-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-filter-bar {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-navbar .page-title {
+                margin-bottom: 10px;
+            }
+
+            .request-card-actions {
+                flex-direction: column;
+            }
+
+            .request-card-actions .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-management.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="overtime.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-requests.html" class="active hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">2</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="users.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="departments.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="report-monthly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="report-yearly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">คำขอเปลี่ยนเวร</h3>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-custom btn-custom-primary" onclick="openNewRequestModal()">
+                    <i class="fas fa-plus me-2"></i> สร้างคำขอใหม่
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar animate__animated animate__fadeInUp">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ค้นหาชื่อบุคลากร..." onkeyup="filterRequests()">
+                </div>
+                <div class="col-md-4">
+                    <select class="custom-select" id="statusFilter" onchange="filterRequests()">
+                        <option value="">ทุกสถานะ</option>
+                        <option value="Pending">รอดำเนินการ</option>
+                        <option value="Approved">อนุมัติแล้ว</option>
+                        <option value="Rejected">ปฏิเสธแล้ว</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="custom-select" id="dateFilter" onchange="filterRequests()">
+                        <option value="">ทุกช่วงเวลา</option>
+                        <option value="today">วันนี้</option>
+                        <option value="thisweek">สัปดาห์นี้</option>
+                        <option value="thismonth">เดือนนี้</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Container -->
+        <div class="requests-container" id="requestsContainer">
+            <!-- Loading State -->
+            <div class="loading-container text-center py-5 w-100" id="loadingContainer">
+                <div class="loading-spinner"></div>
+                <p class="mt-3">กำลังโหลดข้อมูล...</p>
+            </div>
+
+            <!-- Empty State (จะแสดงเมื่อไม่มีคำขอ) -->
+            <div class="empty-state w-100" id="emptyState" style="display: none;">
+                <div class="empty-state-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="empty-state-message">ไม่พบคำขอเปลี่ยนเวร</div>
+                <div class="empty-state-submessage">คุณสามารถสร้างคำขอเปลี่ยนเวรใหม่ได้</div>
+                <button class="btn btn-primary" onclick="openNewRequestModal()">สร้างคำขอใหม่</button>
+            </div>
+
+            <!-- Request Cards จะถูกเพิ่มด้วย JavaScript -->
+        </div>
+
+        <!-- Float Button -->
+        <button class="btn btn-float bg-primary text-white" onclick="openNewRequestModal()">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- New Request Modal -->
+    <div class="modal fade custom-modal" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestModalLabel">สร้างคำขอเปลี่ยนเวรใหม่</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="requestForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="requestUser" class="form-label">บุคลากร</label>
+                                <select class="form-select" id="requestUser" required>
+                                    <option value="">เลือกบุคลากร</option>
+                                    <!-- จะถูกโหลดด้วย JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="requestShift" class="form-label">เวรที่ต้องการเปลี่ยน</label>
+                                <select class="form-select" id="requestShift" required>
+                                    <option value="">เลือกเวร</option>
+                                    <!-- จะถูกโหลดด้วย JavaScript เมื่อเลือกบุคลากร -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="requestReason" class="form-label">เหตุผลในการเปลี่ยนเวร</label>
+                            <textarea class="form-control" id="requestReason" rows="4" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="saveRequestBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Modal (สำหรับตอบกลับคำขอ) -->
+    <div class="modal fade custom-modal" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="responseModalLabel">ตอบกลับคำขอเปลี่ยนเวร</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="responseForm">
+                        <input type="hidden" id="responseRequestId">
+                        <div class="mb-3">
+                            <label for="responseStatus" class="form-label">สถานะ</label>
+                            <select class="form-select" id="responseStatus" required>
+                                <option value="Approved">อนุมัติ</option>
+                                <option value="Rejected">ปฏิเสธ</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="responseReason" class="form-label">หมายเหตุ (ถ้ามี)</label>
+                            <textarea class="form-control" id="responseReason" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="saveResponseBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Request Modal -->
+    <div class="modal fade custom-modal" id="deleteRequestModal" tabindex="-1" aria-labelledby="deleteRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRequestModalLabel">ยืนยันการลบคำขอ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="deleteRequestId">
+                    <p>คุณแน่ใจหรือไม่ว่าต้องการลบคำขอเปลี่ยนเวรนี้?</p>
+                    <p>การกระทำนี้ไม่สามารถเรียกคืนได้</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // ตัวแปรสำหรับเก็บข้อมูล
+        const API_BASE_URL = 'http://localhost:3000';
+        let requestsData = [];
+        let usersData = [];
+        let shiftsData = [];
+        let requestModal;
+        let responseModal;
+        let deleteRequestModal;
+
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // สร้าง Modal objects
+            requestModal = new bootstrap.Modal(document.getElementById('requestModal'));
+            responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
+            deleteRequestModal = new bootstrap.Modal(document.getElementById('deleteRequestModal'));
+
+            // เพิ่ม event listeners
+            document.getElementById('saveRequestBtn').addEventListener('click', saveRequest);
+            document.getElementById('saveResponseBtn').addEventListener('click', saveResponse);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteRequest);
+            document.getElementById('requestUser').addEventListener('change', loadUserShifts);
+
+            // โหลดข้อมูลตั้งต้น
+            loadUsers();
+            loadRequests();
+            updatePendingRequestsCount();
+        });
+
+        // โหลดข้อมูลบุคลากร
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getUsers`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลบุคลากรได้');
+
+                usersData = await response.json();
+
+                // เพิ่มตัวเลือกบุคลากรลงใน dropdown
+                const userSelect = document.getElementById('requestUser');
+                userSelect.innerHTML = '<option value="">เลือกบุคลากร</option>';
+
+                usersData.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.user_id;
+                    option.textContent = user.name;
+                    userSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลบุคลากร:', error);
+                alert('ไม่สามารถโหลดข้อมูลบุคลากรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // โหลดเวรของบุคลากรที่เลือก
+        async function loadUserShifts() {
+            try {
+                const userId = document.getElementById('requestUser').value;
+                if (!userId) return;
+
+                const shiftSelect = document.getElementById('requestShift');
+                shiftSelect.innerHTML = '<option value="">กำลังโหลดข้อมูล...</option>';
+
+                const response = await fetch(`${API_BASE_URL}/getShiftsByUserId/${userId}`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลเวรได้');
+
+                shiftsData = await response.json();
+
+                // กรองเฉพาะเวรในอนาคต
+                const now = new Date();
+                const futureShifts = shiftsData.filter(shift => {
+                    const shiftDate = new Date(shift.shift_date);
+                    return shiftDate >= now;
+                });
+
+                shiftSelect.innerHTML = '<option value="">เลือกเวร</option>';
+
+                // ถ้าไม่มีเวรในอนาคต
+                if (futureShifts.length === 0) {
+                    shiftSelect.innerHTML = '<option value="">ไม่พบเวรในอนาคต</option>';
+                    return;
+                }
+
+                // เพิ่มตัวเลือกเวรลงใน dropdown
+                futureShifts.forEach(shift => {
+                    const shiftDate = new Date(shift.shift_date);
+                    const formattedDate = shiftDate.toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const option = document.createElement('option');
+                    option.value = shift.shift_id;
+                    option.textContent = `${formattedDate} (${shift.start_time} - ${shift.end_time})`;
+                    shiftSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลเวร:', error);
+                const shiftSelect = document.getElementById('requestShift');
+                shiftSelect.innerHTML = '<option value="">ไม่สามารถโหลดข้อมูลเวรได้</option>';
+            }
+        }
+
+        // โหลดข้อมูลคำขอเปลี่ยนเวร
+        async function loadRequests() {
+            try {
+                // แสดง loading
+                document.getElementById('loadingContainer').style.display = 'block';
+                document.getElementById('emptyState').style.display = 'none';
+
+                // เรียก API เพื่อดึงข้อมูลคำขอเปลี่ยนเวร
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอเปลี่ยนเวรได้');
+
+                requestsData = await response.json();
+
+                // ซ่อน loading
+                document.getElementById('loadingContainer').style.display = 'none';
+
+                // แสดงข้อมูลคำขอเปลี่ยนเวร
+                displayRequests(requestsData);
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลคำขอเปลี่ยนเวร:', error);
+
+                // ซ่อน loading และแสดงข้อความผิดพลาด
+                document.getElementById('loadingContainer').style.display = 'none';
+                const container = document.getElementById('requestsContainer');
+                container.innerHTML = `
+                    <div class="empty-state w-100">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="empty-state-message">ไม่สามารถโหลดข้อมูลคำขอเปลี่ยนเวรได้</div>
+                        <div class="empty-state-submessage">โปรดลองใหม่อีกครั้งหรือติดต่อผู้ดูแลระบบ</div>
+                        <button class="btn btn-primary" onclick="loadRequests()">ลองใหม่</button>
+                    </div>
+                `;
+            }
+        }
+
+        // แสดงข้อมูลคำขอเปลี่ยนเวร
+        function displayRequests(requests) {
+            const container = document.getElementById('requestsContainer');
+
+            // ถ้าไม่มีคำขอเปลี่ยนเวร
+            if (requests.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+
+            // เรียงลำดับตามวันที่สร้าง (ล่าสุดขึ้นก่อน)
+            requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // ล้างข้อมูลเก่า
+            container.innerHTML = '';
+
+            // สร้างการ์ดสำหรับแต่ละคำขอ
+            requests.forEach(request => {
+                // แปลงสถานะเป็นภาษาไทยและกำหนด class
+                let statusThai, statusClass;
+                switch (request.status) {
+                    case 'Pending':
+                        statusThai = 'รอดำเนินการ';
+                        statusClass = 'pending';
+                        break;
+                    case 'Approved':
+                        statusThai = 'อนุมัติแล้ว';
+                        statusClass = 'approved';
+                        break;
+                    case 'Rejected':
+                        statusThai = 'ปฏิเสธแล้ว';
+                        statusClass = 'rejected';
+                        break;
+                    default:
+                        statusThai = 'ไม่ระบุ';
+                        statusClass = '';
+                }
+
+                // หาชื่อบุคลากร
+                const user = usersData.find(u => u.user_id === request.user_id);
+                const userName = user ? user.name : 'ไม่ระบุ';
+
+                // จัดรูปแบบวันที่
+                const createdDate = new Date(request.createdAt);
+                const formattedCreatedDate = createdDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // จัดรูปแบบวันที่เวร
+                const shiftDate = new Date(request.shift_date);
+                const formattedShiftDate = shiftDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                // สร้างการ์ด
+                const requestCard = document.createElement('div');
+                requestCard.className = 'request-card animate__animated animate__fadeIn';
+                requestCard.innerHTML = `
+                    <div class="request-card-header">
+                        <div class="request-id">คำขอ #${request.request_id}</div>
+                        <div class="request-status ${statusClass}">${statusThai}</div>
+                    </div>
+                    <div class="request-card-body">
+                        <div class="request-card-info">
+                            <div class="request-card-info-item">
+                                <div class="request-card-info-label">บุคลากร</div>
+                                <div class="request-card-info-value">${userName}</div>
+                            </div>
+                            <div class="request-card-info-item">
+                                <div class="request-card-info-label">วันที่สร้าง</div>
+                                <div class="request-card-info-value">${formattedCreatedDate}</div>
+                            </div>
+                            <div class="request-card-info-item">
+                                <div class="request-card-info-label">วันที่เวร</div>
+                                <div class="request-card-info-value">${formattedShiftDate}</div>
+                            </div>
+                            <div class="request-card-info-item">
+                                <div class="request-card-info-label">เวลาเวร</div>
+                                <div class="request-card-info-value">${request.start_time} - ${request.end_time}</div>
+                            </div>
+                        </div>
+                        <div class="request-card-reason">
+                            <div class="request-card-reason-label">เหตุผลในการเปลี่ยนเวร</div>
+                            <div class="request-card-info-value">${request.reason || '-'}</div>
+                        </div>
+                    </div>
+                    <div class="request-card-actions">
+                `;
+
+                // เพิ่มปุ่มตามสถานะ
+                if (request.status === 'Pending') {
+                    requestCard.querySelector('.request-card-actions').innerHTML += `
+                        <button class="btn btn-sm btn-outline-success" onclick="openResponseModal(${request.request_id}, 'Approved')">
+                            <i class="fas fa-check me-1"></i> อนุมัติ
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="openResponseModal(${request.request_id}, 'Rejected')">
+                            <i class="fas fa-times me-1"></i> ปฏิเสธ
+                        </button>
+                    `;
+                }
+
+                // เพิ่มปุ่มลบ
+                requestCard.querySelector('.request-card-actions').innerHTML += `
+                    <button class="btn btn-sm btn-outline-secondary" onclick="confirmDeleteRequest(${request.request_id})">
+                        <i class="fas fa-trash me-1"></i> ลบ
+                    </button>
+                `;
+
+                // ปิด div ของ request-card-actions
+                requestCard.querySelector('.request-card-actions').innerHTML += `</div>`;
+
+                container.appendChild(requestCard);
+            });
+        }
+
+        // กรองข้อมูลคำขอเปลี่ยนเวร
+        function filterRequests() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            // กำหนดช่วงวันที่ตามตัวกรอง
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const thisWeekStart = new Date(today);
+            thisWeekStart.setDate(today.getDate() - today.getDay()); // วันอาทิตย์ของสัปดาห์นี้
+            const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            // กรองข้อมูล
+            const filteredRequests = requestsData.filter(request => {
+                // กรองตามข้อความค้นหา (ค้นหาในชื่อบุคลากร)
+                const user = usersData.find(u => u.user_id === request.user_id);
+                const userName = user ? user.name.toLowerCase() : '';
+                const nameMatch = userName.includes(searchText);
+
+                // กรองตามสถานะ
+                const statusMatch = !status || request.status === status;
+
+                // กรองตามช่วงวันที่
+                let dateMatch = true;
+                if (dateFilter) {
+                    const requestDate = new Date(request.createdAt);
+                    if (dateFilter === 'today') {
+                        dateMatch = requestDate >= today;
+                    } else if (dateFilter === 'thisweek') {
+                        dateMatch = requestDate >= thisWeekStart;
+                    } else if (dateFilter === 'thismonth') {
+                        dateMatch = requestDate >= thisMonthStart;
+                    }
+                }
+
+                return nameMatch && statusMatch && dateMatch;
+            });
+
+            // แสดงผลลัพธ์
+            displayRequests(filteredRequests);
+        }
+
+        // เปิด Modal สร้างคำขอใหม่
+        function openNewRequestModal() {
+            // ล้างค่าฟอร์ม
+            document.getElementById('requestForm').reset();
+            document.getElementById('requestShift').innerHTML = '<option value="">เลือกเวร</option>';
+
+            // เปลี่ยนชื่อ Modal
+            document.getElementById('requestModalLabel').textContent = 'สร้างคำขอเปลี่ยนเวรใหม่';
+
+            // แสดง Modal
+            requestModal.show();
+        }
+
+        // เปิด Modal ตอบกลับคำขอ
+        function openResponseModal(requestId, initialStatus) {
+            document.getElementById('responseRequestId').value = requestId;
+            document.getElementById('responseStatus').value = initialStatus;
+            document.getElementById('responseReason').value = '';
+            responseModal.show();
+        }
+
+        // ยืนยันการลบคำขอ
+        function confirmDeleteRequest(requestId) {
+            document.getElementById('deleteRequestId').value = requestId;
+            deleteRequestModal.show();
+        }
+
+        // บันทึกคำขอเปลี่ยนเวรใหม่
+        async function saveRequest() {
+            try {
+                // ดึงข้อมูลจากฟอร์ม
+                const userId = document.getElementById('requestUser').value;
+                const shiftId = document.getElementById('requestShift').value;
+                const reason = document.getElementById('requestReason').value;
+
+                // ตรวจสอบข้อมูล
+                if (!userId || !shiftId || !reason) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+
+                // สร้างข้อมูลสำหรับส่งไป API
+                const requestData = {
+                    user_id: userId,
+                    shift_id: shiftId,
+                    reason: reason
+                };
+
+                // ส่งข้อมูลไป API
+                const response = await fetch(`${API_BASE_URL}/addRequest`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) throw new Error('ไม่สามารถบันทึกคำขอเปลี่ยนเวรได้');
+
+                // ปิด Modal
+                requestModal.hide();
+
+                // โหลดข้อมูลคำขอเปลี่ยนเวรใหม่
+                loadRequests();
+                updatePendingRequestsCount();
+
+                // แสดงข้อความสำเร็จ
+                alert('บันทึกคำขอเปลี่ยนเวรเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการบันทึกคำขอเปลี่ยนเวร:', error);
+                alert('ไม่สามารถบันทึกคำขอเปลี่ยนเวรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // บันทึกการตอบกลับคำขอ
+        async function saveResponse() {
+            try {
+                // ดึงข้อมูลจากฟอร์ม
+                const requestId = document.getElementById('responseRequestId').value;
+                const status = document.getElementById('responseStatus').value;
+                const reason = document.getElementById('responseReason').value;
+
+                // ตรวจสอบข้อมูล
+                if (!requestId || !status) {
+                    alert('ข้อมูลไม่ครบถ้วน');
+                    return;
+                }
+
+                // สร้างข้อมูลสำหรับส่งไป API
+                const responseData = {
+                    request_id: requestId,
+                    status: status,
+                    reason: reason
+                };
+
+                // ส่งข้อมูลไป API
+                const response = await fetch(`${API_BASE_URL}/updateRequest`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(responseData)
+                });
+
+                if (!response.ok) throw new Error('ไม่สามารถบันทึกการตอบกลับได้');
+
+                // ปิด Modal
+                responseModal.hide();
+
+                // โหลดข้อมูลคำขอเปลี่ยนเวรใหม่
+                loadRequests();
+                updatePendingRequestsCount();
+
+                // แสดงข้อความสำเร็จ
+                alert('บันทึกการตอบกลับเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการบันทึกการตอบกลับ:', error);
+                alert('ไม่สามารถบันทึกการตอบกลับได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // ลบคำขอเปลี่ยนเวร
+        async function deleteRequest() {
+            try {
+                const requestId = document.getElementById('deleteRequestId').value;
+
+                if (!requestId) {
+                    deleteRequestModal.hide();
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/deleteRequest/${requestId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('ไม่สามารถลบคำขอเปลี่ยนเวรได้');
+
+                // ปิด Modal
+                deleteRequestModal.hide();
+
+                // โหลดข้อมูลคำขอเปลี่ยนเวรใหม่
+                loadRequests();
+                updatePendingRequestsCount();
+
+                // แสดงข้อความสำเร็จ
+                alert('ลบคำขอเปลี่ยนเวรเรียบร้อย');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการลบคำขอเปลี่ยนเวร:', error);
+                alert('ไม่สามารถลบคำขอเปลี่ยนเวรได้ กรุณาลองใหม่อีกครั้ง');
+                deleteRequestModal.hide();
+            }
+        }
+
+        // อัพเดตจำนวนคำขอเปลี่ยนเวรที่รอดำเนินการ
+        async function updatePendingRequestsCount() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอได้');
+
+                const requests = await response.json();
+
+                // นับจำนวนคำขอที่มีสถานะ 'Pending'
+                const pendingCount = requests.filter(req => req.status === 'Pending').length;
+
+                // อัพเดต badge
+                const badge = document.getElementById('pendingRequestsCount');
+                badge.textContent = pendingCount;
+
+                // ซ่อน badge ถ้าไม่มีคำขอที่รอดำเนินการ
+                if (pendingCount === 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลคำขอ:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

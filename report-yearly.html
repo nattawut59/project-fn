@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>รายงานประจำปี - Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .custom-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .custom-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        /* Card Styles */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .stats-card .stats-title {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stats-card .stats-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .stats-card .stats-desc {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .stats-card.primary .stats-icon {
+            background: var(--primary-gradient);
+        }
+
+        .stats-card.success .stats-icon {
+            background: var(--success-gradient);
+        }
+
+        .stats-card.warning .stats-icon {
+            background: var(--warning-gradient);
+        }
+
+        .stats-card.info .stats-icon {
+            background: var(--info-gradient);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-submessage {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* Export Button */
+        .btn-export {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-export:hover {
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-navbar .page-title {
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-management.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="overtime.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-requests.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="users.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="departments.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="report-monthly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="report-yearly.html" class="active hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">รายงานประจำปี</h3>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-export" onclick="exportReport()">
+                    <i class="fas fa-file-export me-2"></i> ส่งออกรายงาน
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar animate__animated animate__fadeInUp">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <label for="yearFilter" class="form-label">เลือกปี</label>
+                    <select class="custom-select" id="yearFilter" onchange="filterYearlyData()">
+                        <option value="2025">ปี 2025</option>
+                        <option value="2024">ปี 2024</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="departmentFilter" class="form-label">แผนก</label>
+                    <select class="custom-select" id="departmentFilter" onchange="filterYearlyData()">
+                        <option value="">ทุกแผนก</option>
+                        <!-- จะถูกโหลดด้วย JavaScript -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="row gy-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card primary">
+                    <div class="stats-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stats-title">จำนวนเวรทั้งหมด</div>
+                    <div class="stats-value" id="totalShiftsValue">0</div>
+                    <div class="stats-desc">เวรทั้งหมดของทั้งปี</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card success">
+                    <div class="stats-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stats-title">ชั่วโมง OT รวม</div>
+                    <div class="stats-value" id="totalOTHoursValue">0</div>
+                    <div class="stats-desc">ชั่วโมงทั้งหมดของทั้งปี</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card warning">
+                    <div class="stats-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stats-title">ค่า OT รวม</div>
+                    <div class="stats-value" id="totalOTPaymentValue">฿0</div>
+                    <div class="stats-desc">ค่าใช้จ่าย OT ทั้งปี</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card info">
+                    <div class="stats-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stats-title">คำขอเปลี่ยนเวร</div>
+                    <div class="stats-value" id="totalRequestsValue">0</div>
+                    <div class="stats-desc">จำนวนคำขอทั้งปี</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row gy-4 mt-3">
+            <!-- Monthly OT Hours Chart -->
+            <div class="col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="content-card h-100">
+                    <div class="card-title">
+                        <span>ชั่วโมง OT รายเดือน</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthlyOTChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department OT Distribution Chart -->
+            <div class="col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="content-card h-100">
+                    <div class="card-title">
+                        <span>สัดส่วน OT ตามแผนก</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="departmentOTChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More Charts Row -->
+        <div class="row gy-4 mt-3">
+            <!-- Quarterly OT Comparison Chart -->
+            <div class="col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+                <div class="content-card h-100">
+                    <div class="card-title">
+                        <span>เปรียบเทียบ OT รายไตรมาส</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="quarterlyOTChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff OT Comparison Chart -->
+            <div class="col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+                <div class="content-card h-100">
+                    <div class="card-title">
+                        <span>ชั่วโมง OT บุคลากรสูงสุด (Top 5)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="staffOTChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top OT Staff Table -->
+        <div class="content-card mt-4 animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+            <div class="card-title">
+                <span>บุคลากรที่มีชั่วโมง OT สูงสุด</span>
+            </div>
+            <div class="table-responsive">
+                <table class="custom-table" id="topOTStaffTable">
+                    <thead>
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>ตำแหน่ง</th>
+                            <th>แผนก</th>
+                            <th>ชั่วโมง OT</th>
+                            <th>ค่า OT (บาท)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topOTStaffTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>กำลังโหลดข้อมูล...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly Request Trends Table -->
+        <div class="content-card mt-4 animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+            <div class="card-title">
+                <span>แนวโน้มคำขอเปลี่ยนเวรรายเดือน</span>
+            </div>
+            <div class="table-responsive">
+                <table class="custom-table" id="monthlyRequestTable">
+                    <thead>
+                        <tr>
+                            <th>เดือน</th>
+                            <th>จำนวนคำขอ</th>
+                            <th>อนุมัติแล้ว</th>
+                            <th>ปฏิเสธแล้ว</th>
+                            <th>อัตราการอนุมัติ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyRequestTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>กำลังโหลดข้อมูล...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // ตัวแปรสำหรับเก็บข้อมูล
+        const API_BASE_URL = 'http://127.0.0.1:3000';
+        let departmentsData = [];
+        let yearlyData = {
+            totalShifts: 0,
+            totalOTHours: 0,
+            totalOTPayment: 0,
+            totalRequests: 0,
+            monthlyOT: [],
+            departmentOT: [],
+            quarterlyOT: [],
+            topStaffOT: [],
+            monthlyRequests: []
+        };
+        
+        // ตัวแปรสำหรับเก็บ Chart objects
+        let monthlyOTChart;
+        let departmentOTChart;
+        let quarterlyOTChart;
+        let staffOTChart;
+
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // โหลดข้อมูลแผนก
+            loadDepartments();
+            
+            // โหลดข้อมูลรายงานประจำปี
+            const currentYear = new Date().getFullYear();
+            document.getElementById('yearFilter').value = currentYear;
+            loadYearlyReport(currentYear);
+            
+            // อัพเดตจำนวนคำขอที่รอดำเนินการ
+            updatePendingRequestsCount();
+        });
+
+        // โหลดข้อมูลแผนก
+        async function loadDepartments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getDepartments`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลแผนกได้');
+
+                departmentsData = await response.json();
+
+                // เพิ่มตัวเลือกแผนกลงใน dropdown
+                const departmentFilter = document.getElementById('departmentFilter');
+                departmentFilter.innerHTML = '<option value="">ทุกแผนก</option>';
+
+                departmentsData.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.dept_id;
+                    option.textContent = dept.dept_name;
+                    departmentFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลแผนก:', error);
+                alert('ไม่สามารถโหลดข้อมูลแผนกได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // โหลดข้อมูลรายงานประจำปี
+        async function loadYearlyReport(year) {
+            try {
+                // แสดง loading state
+                document.getElementById('totalShiftsValue').textContent = 'กำลังโหลด...';
+                document.getElementById('totalOTHoursValue').textContent = 'กำลังโหลด...';
+                document.getElementById('totalOTPaymentValue').textContent = 'กำลังโหลด...';
+                document.getElementById('totalRequestsValue').textContent = 'กำลังโหลด...';
+
+                const departmentId = document.getElementById('departmentFilter').value;
+                
+                // Step 1: โหลดข้อมูลสรุปทั้งปี (จำนวนเวร, OT, คำขอ)
+                await loadYearlySummary(year, departmentId);
+                
+                // Step 2: โหลดข้อมูล OT รายเดือน
+                await loadMonthlyOTData(year, departmentId);
+                
+                // Step 3: โหลดข้อมูล OT ตามแผนก
+                await loadDepartmentOTData(year);
+                
+                // Step 4: โหลดข้อมูล OT รายไตรมาส
+                await loadQuarterlyOTData(year, departmentId);
+                
+                // Step 5: โหลดข้อมูลบุคลากรที่มี OT สูงสุด
+                await loadTopStaffOTData(year, departmentId);
+                
+                // Step 6: โหลดข้อมูลคำขอเปลี่ยนเวรรายเดือน
+                await loadMonthlyRequestData(year, departmentId);
+                
+                // สร้างกราฟ
+                createMonthlyOTChart();
+                createDepartmentOTChart();
+                createQuarterlyOTChart();
+                createStaffOTChart();
+                
+                // อัพเดตตาราง
+                updateTopOTStaffTable();
+                updateMonthlyRequestTable();
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลรายงานประจำปี:', error);
+                alert('ไม่สามารถโหลดข้อมูลรายงานประจำปีได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // กรองข้อมูลรายปีตามแผนกที่เลือก
+        function filterYearlyData() {
+            const year = document.getElementById('yearFilter').value;
+            loadYearlyReport(year);
+        }
+        
+        // โหลดข้อมูลสรุปทั้งปี
+        async function loadYearlySummary(year, departmentId) {
+            try {
+                let url = `${API_BASE_URL}/getYearlyStats?year=${year}`;
+                if (departmentId) {
+                    url += `&dept_id=${departmentId}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลสรุปประจำปีได้');
+                
+                const data = await response.json();
+                
+                // อัพเดตข้อมูลสรุป
+                yearlyData.totalShifts = data.totalShifts || 0;
+                yearlyData.totalOTHours = data.totalOTHours || 0;
+                yearlyData.totalOTPayment = data.totalOTPayment || 0;
+                yearlyData.totalRequests = data.totalRequests || 0;
+                
+                // อัพเดตค่าสรุปในหน้าเว็บ
+                updateSummaryValues();
+            } catch (error) {
+                console.error('Error loading yearly summary:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                yearlyData.totalShifts = 0;
+                yearlyData.totalOTHours = 0;
+                yearlyData.totalOTPayment = 0;
+                yearlyData.totalRequests = 0;
+                updateSummaryValues();
+            }
+        }
+        
+        // โหลดข้อมูล OT รายเดือน
+        async function loadMonthlyOTData(year, departmentId) {
+            try {
+                let url = `${API_BASE_URL}/getMonthlyOTStats?year=${year}`;
+                if (departmentId) {
+                    url += `&dept_id=${departmentId}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูล OT รายเดือนได้');
+                
+                const data = await response.json();
+                yearlyData.monthlyOT = data || [];
+                
+                // กรณีไม่มีข้อมูลบางเดือน ให้เติมด้วยค่า 0
+                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                const filledData = [];
+                
+                months.forEach((month, index) => {
+                    const monthData = yearlyData.monthlyOT.find(item => item.month === month || item.month_number === index + 1);
+                    
+                    if (monthData) {
+                        filledData.push({
+                            month: month,
+                            hours: monthData.hours || 0
+                        });
+                    } else {
+                        filledData.push({
+                            month: month,
+                            hours: 0
+                        });
+                    }
+                });
+                
+                yearlyData.monthlyOT = filledData;
+            } catch (error) {
+                console.error('Error loading monthly OT data:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                yearlyData.monthlyOT = months.map(month => ({ month, hours: 0 }));
+            }
+        }
+        
+        // โหลดข้อมูล OT ตามแผนก
+        async function loadDepartmentOTData(year) {
+            try {
+                const url = `${API_BASE_URL}/getDepartmentOTStats?year=${year}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูล OT ตามแผนกได้');
+                
+                const data = await response.json();
+                yearlyData.departmentOT = data || [];
+                
+                // แปลงข้อมูลให้อยู่ในรูปแบบที่ต้องการ
+                yearlyData.departmentOT = yearlyData.departmentOT.map(item => ({
+                    department: item.dept_name || 'ไม่ระบุแผนก',
+                    hours: item.hours || 0
+                }));
+            } catch (error) {
+                console.error('Error loading department OT data:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                yearlyData.departmentOT = [];
+            }
+        }
+        
+        // โหลดข้อมูล OT รายไตรมาส
+        async function loadQuarterlyOTData(year, departmentId) {
+            try {
+                let url = `${API_BASE_URL}/getQuarterlyOTStats?year=${year}`;
+                if (departmentId) {
+                    url += `&dept_id=${departmentId}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูล OT รายไตรมาสได้');
+                
+                const data = await response.json();
+                yearlyData.quarterlyOT = data || [];
+                
+                // แปลงข้อมูลให้อยู่ในรูปแบบที่ต้องการ
+                yearlyData.quarterlyOT = yearlyData.quarterlyOT.map(item => ({
+                    quarter: `Q${item.quarter || 0}`,
+                    hours: item.hours || 0
+                }));
+                
+                // กรณีไม่มีข้อมูลบางไตรมาส ให้เติมด้วยค่า 0
+                const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+                const filledData = [];
+                
+                quarters.forEach(quarter => {
+                    const quarterData = yearlyData.quarterlyOT.find(item => item.quarter === quarter);
+                    
+                    if (quarterData) {
+                        filledData.push(quarterData);
+                    } else {
+                        filledData.push({
+                            quarter: quarter,
+                            hours: 0
+                        });
+                    }
+                });
+                
+                yearlyData.quarterlyOT = filledData;
+            } catch (error) {
+                console.error('Error loading quarterly OT data:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                yearlyData.quarterlyOT = [
+                    { quarter: 'Q1', hours: 0 },
+                    { quarter: 'Q2', hours: 0 },
+                    { quarter: 'Q3', hours: 0 },
+                    { quarter: 'Q4', hours: 0 }
+                ];
+            }
+        }
+        
+        // โหลดข้อมูลบุคลากรที่มี OT สูงสุด
+        async function loadTopStaffOTData(year, departmentId) {
+            try {
+                let url = `${API_BASE_URL}/getStaffOT?year=${year}`;
+                if (departmentId) {
+                    url += `&dept_id=${departmentId}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลบุคลากรที่มี OT สูงสุดได้');
+                
+                const data = await response.json();
+                yearlyData.topStaffOT = data || [];
+                
+                // แปลงข้อมูลให้อยู่ในรูปแบบที่ต้องการ
+                yearlyData.topStaffOT = yearlyData.topStaffOT.map(item => ({
+                    name: item.name || 'ไม่ระบุชื่อ',
+                    position: item.role || 'ไม่ระบุตำแหน่ง',
+                    department: item.dept_name || 'ไม่ระบุแผนก',
+                    hours: item.hours || 0,
+                    payment: item.total_payment || 0
+                }));
+                
+                // เรียงลำดับตามชั่วโมง OT มากไปน้อย
+                yearlyData.topStaffOT.sort((a, b) => b.hours - a.hours);
+            } catch (error) {
+                console.error('Error loading top staff OT data:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                yearlyData.topStaffOT = [];
+            }
+        }
+        
+        // โหลดข้อมูลคำขอเปลี่ยนเวรรายเดือน
+        async function loadMonthlyRequestData(year, departmentId) {
+            try {
+                let url = `${API_BASE_URL}/getMonthlyRequestStats?year=${year}`;
+                if (departmentId) {
+                    url += `&dept_id=${departmentId}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอเปลี่ยนเวรรายเดือนได้');
+                
+                const data = await response.json();
+                yearlyData.monthlyRequests = data || [];
+                
+                // แปลงข้อมูลให้อยู่ในรูปแบบที่ต้องการ
+                yearlyData.monthlyRequests = yearlyData.monthlyRequests.map(item => {
+                    const totalRequests = (item.totalRequests || 0);
+                    const approvedRequests = (item.approvedRequests || 0);
+                    const rejectedRequests = (item.rejectedRequests || 0);
+                    const approvalRate = totalRequests > 0 ? (approvedRequests / totalRequests * 100).toFixed(1) : '0.0';
+                    
+                    return {
+                        month: item.month || 'ไม่ระบุเดือน',
+                        totalRequests: totalRequests,
+                        approvedRequests: approvedRequests,
+                        rejectedRequests: rejectedRequests,
+                        approvalRate: approvalRate
+                    };
+                });
+                
+                // กรณีไม่มีข้อมูลบางเดือน ให้เติมด้วยค่า 0
+                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                const filledData = [];
+                
+                months.forEach(month => {
+                    const monthData = yearlyData.monthlyRequests.find(item => item.month === month);
+                    
+                    if (monthData) {
+                        filledData.push(monthData);
+                    } else {
+                        filledData.push({
+                            month: month,
+                            totalRequests: 0,
+                            approvedRequests: 0,
+                            rejectedRequests: 0,
+                            approvalRate: '0.0'
+                        });
+                    }
+                });
+                
+                yearlyData.monthlyRequests = filledData;
+            } catch (error) {
+                console.error('Error loading monthly request data:', error);
+                // ใช้ค่าเริ่มต้นกรณีเกิดข้อผิดพลาด
+                const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                yearlyData.monthlyRequests = months.map(month => ({
+                    month: month,
+                    totalRequests: 0,
+                    approvedRequests: 0,
+                    rejectedRequests: 0,
+                    approvalRate: '0.0'
+                }));
+            }
+        }
+
+        // สร้างกราฟชั่วโมง OT รายเดือน
+        function createMonthlyOTChart() {
+            const ctx = document.getElementById('monthlyOTChart').getContext('2d');
+            
+            // ทำลายกราฟเดิมถ้ามี
+            if (monthlyOTChart) {
+                monthlyOTChart.destroy();
+            }
+            
+            monthlyOTChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: yearlyData.monthlyOT.map(item => item.month),
+                    datasets: [{
+                        label: 'ชั่วโมง OT',
+                        data: yearlyData.monthlyOT.map(item => item.hours),
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ชั่วโมง'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'เดือน'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `ชั่วโมง OT: ${context.parsed.y.toLocaleString()} ชม.`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // สร้างกราฟสัดส่วน OT ตามแผนก
+        function createDepartmentOTChart() {
+            const ctx = document.getElementById('departmentOTChart').getContext('2d');
+            
+            // ทำลายกราฟเดิมถ้ามี
+            if (departmentOTChart) {
+                departmentOTChart.destroy();
+            }
+            
+            // ถ้าไม่มีข้อมูล
+            if (yearlyData.departmentOT.length === 0) {
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#6c757d';
+                ctx.fillText('ไม่พบข้อมูล OT ตามแผนก', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // สร้างสีสำหรับแต่ละแผนก
+            const colorPalette = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 205, 86, 0.7)',
+                'rgba(201, 203, 207, 0.7)',
+                'rgba(255, 99, 71, 0.7)',
+                'rgba(50, 205, 50, 0.7)'
+            ];
+            
+            departmentOTChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: yearlyData.departmentOT.map(item => item.department),
+                    datasets: [{
+                        data: yearlyData.departmentOT.map(item => item.hours),
+                        backgroundColor: colorPalette.slice(0, yearlyData.departmentOT.length),
+                        borderColor: colorPalette.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = Math.round((context.parsed / total) * 100);
+                                    return `${context.label}: ${context.parsed.toLocaleString()} ชม. (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // สร้างกราฟเปรียบเทียบ OT รายไตรมาส
+        function createQuarterlyOTChart() {
+            const ctx = document.getElementById('quarterlyOTChart').getContext('2d');
+            
+            // ทำลายกราฟเดิมถ้ามี
+            if (quarterlyOTChart) {
+                quarterlyOTChart.destroy();
+            }
+            
+            quarterlyOTChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: yearlyData.quarterlyOT.map(item => item.quarter),
+                    datasets: [{
+                        label: 'ชั่วโมง OT',
+                        data: yearlyData.quarterlyOT.map(item => item.hours),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ชั่วโมง'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ไตรมาส'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `ชั่วโมง OT: ${context.parsed.y.toLocaleString()} ชม.`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // สร้างกราฟเปรียบเทียบชั่วโมง OT ของบุคลากร (Top 5)
+        function createStaffOTChart() {
+            const ctx = document.getElementById('staffOTChart').getContext('2d');
+            
+            // ทำลายกราฟเดิมถ้ามี
+            if (staffOTChart) {
+                staffOTChart.destroy();
+            }
+            
+            // ถ้าไม่มีข้อมูล
+            if (yearlyData.topStaffOT.length === 0) {
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#6c757d';
+                ctx.fillText('ไม่พบข้อมูลบุคลากร', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // เลือกเฉพาะ 5 อันดับแรก
+            const topFive = yearlyData.topStaffOT.slice(0, 5);
+            
+            staffOTChart = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: topFive.map(item => item.name),
+                    datasets: [{
+                        label: 'ชั่วโมง OT',
+                        data: topFive.map(item => item.hours),
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ชั่วโมง'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `ชั่วโมง OT: ${context.parsed.x.toLocaleString()} ชม.`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // อัพเดตตารางบุคลากรที่มี OT สูงสุด
+        function updateTopOTStaffTable() {
+            const tbody = document.getElementById('topOTStaffTableBody');
+            
+            // ถ้าไม่มีข้อมูล
+            if (yearlyData.topStaffOT.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูลบุคลากร
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            yearlyData.topStaffOT.forEach((staff, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${staff.name}</td>
+                    <td>${staff.position}</td>
+                    <td>${staff.department}</td>
+                    <td>${staff.hours.toLocaleString()}</td>
+                    <td>${staff.payment.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // อัพเดตตารางแนวโน้มคำขอเปลี่ยนเวรรายเดือน
+        function updateMonthlyRequestTable() {
+            const tbody = document.getElementById('monthlyRequestTableBody');
+            
+            // ถ้าไม่มีข้อมูล
+            if (yearlyData.monthlyRequests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูลคำขอเปลี่ยนเวร
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            yearlyData.monthlyRequests.forEach(request => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${request.month}</td>
+                    <td>${request.totalRequests}</td>
+                    <td>${request.approvedRequests}</td>
+                    <td>${request.rejectedRequests}</td>
+                    <td>${request.approvalRate}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // ส่งออกรายงาน
+        function exportReport() {
+            // ในตัวอย่างนี้ เราจะแค่แสดง alert
+            // ในโปรเจคจริง ควรใช้ไลบรารีสำหรับสร้าง PDF, Excel, หรือส่งคำขอไปยัง API เพื่อส่งออกรายงาน
+            
+            alert('กำลังส่งออกรายงานประจำปี ' + document.getElementById('yearFilter').value);
+            
+            // ตัวอย่างการเรียก API เพื่อส่งออกรายงาน
+            // const year = document.getElementById('yearFilter').value;
+            // const departmentId = document.getElementById('departmentFilter').value;
+            // window.location.href = `${API_BASE_URL}/exportYearlyReport?year=${year}&dept_id=${departmentId}`;
+        }
+        
+        // อัพเดตจำนวนคำขอเปลี่ยนเวรที่รอดำเนินการ
+        async function updatePendingRequestsCount() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอได้');
+
+                const requests = await response.json();
+
+                // นับจำนวนคำขอที่มีสถานะ 'Pending'
+                const pendingCount = requests.filter(req => req.status === 'Pending').length;
+
+                // อัพเดต badge
+                const badge = document.getElementById('pendingRequestsCount');
+                badge.textContent = pendingCount;
+
+                // ซ่อน badge ถ้าไม่มีคำขอที่รอดำเนินการ
+                if (pendingCount === 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลคำขอ:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>คำนวณ OT - Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Search & Filter Bar */
+        .search-filter-bar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .custom-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .custom-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        .search-input {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+            outline: none;
+        }
+
+        /* Card Styles */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .content-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(rgba(255, 255, 255, 0.1) 10%, transparent 10.5%);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        .summary-card h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .summary-card .summary-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 48px;
+            opacity: 0.2;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Custom Button */
+        .btn-custom {
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-custom-primary {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+        }
+
+        .btn-custom-primary:hover {
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn-edit {
+            background-color: #e7f3ff;
+            color: #0d6efd;
+        }
+
+        .action-btn-delete {
+            background-color: #ffe7e7;
+            color: #dc3545;
+        }
+
+        .action-btn-view {
+            background-color: #e7fff3;
+            color: #198754;
+        }
+
+        /* Modal Styles */
+        .custom-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-modal .modal-header {
+            background: var(--primary-gradient);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            color: white;
+            border-bottom: none;
+        }
+
+        .custom-modal .modal-title {
+            font-weight: 600;
+        }
+
+        .custom-modal .modal-footer {
+            border-top: none;
+            padding: 15px 20px;
+        }
+
+        .custom-modal .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .custom-modal .form-control,
+        .custom-modal .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .custom-modal .form-control:focus,
+        .custom-modal .form-select:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-filter-bar {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .top-navbar .page-title {
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* OT Calculator Specific Styles */
+        .ot-calculator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .ot-calculator-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        
+        .ot-calculator-form .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .ot-calculator-form .form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .ot-calculator-form .form-control:focus {
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+        
+        .ot-calculator-result {
+            background: linear-gradient(135deg, #7269ef, #4776e6);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ot-calculator-result::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(rgba(255, 255, 255, 0.1) 10%, transparent 10.5%);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+        
+        .ot-result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .ot-result-row:last-child {
+            border-bottom: none;
+        }
+        
+        .ot-result-label {
+            font-weight: 500;
+        }
+        
+        .ot-result-value {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .ot-total-row {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .ot-total-label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .ot-total-value {
+            font-weight: 700;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-management.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="overtime.html" class="active hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="shift-requests.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="users.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="departments.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="report-monthly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="report-yearly.html" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">คำนวณ OT</h3>
+            <div class="d-flex align-items-center">
+                <div class="month-selector me-4">
+                    <select class="custom-select" id="monthSelector" onchange="loadOvertimes()">
+                        <option value="มกราคม 2025">มกราคม 2025</option>
+                        <option value="กุมภาพันธ์ 2025">กุมภาพันธ์ 2025</option>
+                        <option value="มีนาคม 2025">มีนาคม 2025</option>
+                        <option value="เมษายน 2025">เมษายน 2025</option>
+                        <option value="พฤษภาคม 2025">พฤษภาคม 2025</option>
+                        <option value="มิถุนายน 2025">มิถุนายน 2025</option>
+                        <option value="กรกฎาคม 2025">กรกฎาคม 2025</option>
+                        <option value="สิงหาคม 2025">สิงหาคม 2025</option>
+                        <option value="กันยายน 2025">กันยายน 2025</option>
+                        <option value="ตุลาคม 2025">ตุลาคม 2025</option>
+                        <option value="พฤศจิกายน 2025">พฤศจิกายน 2025</option>
+                        <option value="ธันวาคม 2025">ธันวาคม 2025</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- OT Summary Cards -->
+        <div class="row animate__animated animate__fadeInUp">
+            <div class="col-md-4">
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 id="totalOTHours">0</h3>
+                    <p>จำนวนชั่วโมง OT ทั้งหมด</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card" style="background: linear-gradient(135deg, #05c075, #01a75a);">
+                    <div class="summary-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3 id="totalOTPayment">0</h3>
+                    <p>ค่าตอบแทน OT ทั้งหมด (บาท)</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card" style="background: linear-gradient(135deg, #f7b733, #fc4a1a);">
+                    <div class="summary-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <h3 id="avgOTPerPerson">0</h3>
+                    <p>เฉลี่ยชั่วโมง OT ต่อคน</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ค้นหาชื่อบุคลากร..." onkeyup="filterOvertimes()">
+                </div>
+                <div class="col-md-4">
+                    <select class="custom-select" id="departmentFilter" onchange="filterOvertimes()">
+                        <option value="">ทุกแผนก</option>
+                        <!-- แผนกจะถูกโหลดด้วย JavaScript -->
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="custom-select" id="roleFilter" onchange="filterOvertimes()">
+                        <option value="">ทั้งหมด</option>
+                        <option value="Doctor">แพทย์</option>
+                        <option value="Nurse">พยาบาล</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- OT Table Card -->
+        <div class="content-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="card-title">
+                <span>รายการ OT</span>
+                <button class="btn btn-custom btn-custom-primary" onclick="exportOTData()">
+                    <i class="fas fa-file-export me-2"></i> ส่งออกข้อมูล
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="custom-table" id="overtimesTable">
+                    <thead>
+                        <tr>
+                            <th>ชื่อ</th>
+                            <th>แผนก</th>
+                            <th>ตำแหน่ง</th>
+                            <th>วันที่</th>
+                            <th>เวลาทำงาน</th>
+                            <th>จำนวนชั่วโมง OT</th>
+                            <th>อัตราค่าจ้าง/ชม.</th>
+                            <th>ค่าตอบแทนรวม</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overtimesTableBody">
+                        <!-- ข้อมูลจะถูกโหลดด้วย JavaScript -->
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>กำลังโหลดข้อมูล...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- OT Calculator -->
+        <div class="ot-calculator animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+            <div class="ot-calculator-title">
+                <i class="fas fa-calculator me-2"></i> เครื่องคำนวณ OT
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="ot-calculator-form">
+                        <div class="mb-3">
+                            <label for="calculatorRole" class="form-label">ตำแหน่ง</label>
+                            <select class="form-control" id="calculatorRole" onchange="updateRateByRole()">
+                                <option value="">เลือกตำแหน่ง</option>
+                                <option value="Doctor">แพทย์</option>
+                                <option value="Nurse">พยาบาล</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="calculatorHours" class="form-label">จำนวนชั่วโมงทำงาน</label>
+                            <input type="number" class="form-control" id="calculatorHours" min="0" step="0.5" placeholder="ป้อนจำนวนชั่วโมง">
+                        </div>
+                        <div class="mb-3">
+                            <label for="calculatorRate" class="form-label">อัตราค่าจ้างต่อชั่วโมง (บาท)</label>
+                            <input type="number" class="form-control" id="calculatorRate" min="0" placeholder="ป้อนอัตราค่าจ้าง">
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100" onclick="calculateOT()">คำนวณ</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="ot-calculator-result" id="calculatorResult" style="display: none;">
+                        <div class="ot-result-row">
+                            <div class="ot-result-label">ตำแหน่ง:</div>
+                            <div class="ot-result-value" id="resultRole">-</div>
+                        </div>
+                        <div class="ot-result-row">
+                            <div class="ot-result-label">จำนวนชั่วโมงทำงาน:</div>
+                            <div class="ot-result-value" id="resultHours">-</div>
+                        </div>
+                        <div class="ot-result-row">
+                            <div class="ot-result-label">อัตราค่าจ้างต่อชั่วโมง:</div>
+                            <div class="ot-result-value" id="resultRate">-</div>
+                        </div>
+                        <div class="ot-result-row ot-total-row">
+                            <div class="ot-total-label">ค่าตอบแทน OT รวม:</div>
+                            <div class="ot-total-value" id="resultTotal">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // ตัวแปรสำหรับเก็บข้อมูล
+        const API_BASE_URL = 'http://localhost:3000';
+        let overtimesData = [];
+        let departmentsData = [];
+        
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // โหลดข้อมูลตั้งต้น
+            loadDepartments();
+            loadOvertimes();
+            updatePendingRequestsCount();
+        });
+        
+        // โหลดข้อมูลแผนก
+        async function loadDepartments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getDepartments`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลแผนกได้');
+                
+                departmentsData = await response.json();
+                
+                // เพิ่มตัวเลือกแผนกลงใน dropdown
+                const departmentFilter = document.getElementById('departmentFilter');
+                departmentsData.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.dept_id;
+                    option.textContent = dept.dept_name;
+                    departmentFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลแผนก:', error);
+                alert('ไม่สามารถโหลดข้อมูลแผนกได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+        
+        // โหลดข้อมูล OT
+        async function loadOvertimes() {
+            try {
+                const selectedMonth = document.getElementById('monthSelector').value;
+                let startDate, endDate;
+                
+                // แปลงชื่อเดือนไทยเป็นวันที่
+                switch (selectedMonth) {
+                    case 'มกราคม ':
+                        startDate = '2025-01-01';
+                        endDate = '2025-01-31';
+                        break;
+                    case 'กุมภาพันธ์ ':
+                        startDate = '2025-02-01';
+                        endDate = '2025-02-28';
+                        break;
+                    case 'มีนาคม 2025':
+                        startDate = '2025-03-01';
+                        endDate = '2025-03-31';
+                        break;
+                    case 'เมษายน ':
+                        startDate = '2025-04-01';
+                        endDate = '2025-04-30';
+                        break;
+                    case 'พฤษภาคม ':
+                        startDate = '2025-05-01';
+                        endDate = '2025-05-31';
+                        break;
+                    case 'มิถุนายน ':
+                        startDate = '2025-06-01';
+                        endDate = '2025-06-30';
+                        break;
+                    case 'กรกฎาคม ':
+                        startDate = '2025-07-01';
+                        endDate = '2025-07-31';
+                        break;
+                    case 'สิงหาคม ':
+                        startDate = '2025-08-01';
+                        endDate = '2025-08-31';
+                        break;
+                    case 'กันยายน ':
+                        startDate = '2025-09-01';
+                        endDate = '2025-09-30';
+                        break;
+                    case 'ตุลาคม ':
+                        startDate = '2025-10-01';
+                        endDate = '2025-10-31';
+                        break;
+                    case 'พฤศจิกายน ':
+                        startDate = '2025-11-01';
+                        endDate = '2025-11-30';
+                        break;
+                    case 'ธันวาคม ':
+                        startDate = '2025-12-01';
+                        endDate = '2025-12-31';
+                        break;
+                    default:
+                        startDate = '2025-01-01';
+                        endDate = '2025-01-31';
+                }
+                
+                // แสดง loading
+                document.getElementById('overtimesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="loading-spinner"></div>
+                            <p>กำลังโหลดข้อมูล...</p>
+                        </td>
+                    </tr>
+                `;
+                
+                // เรียก API เพื่อดึงข้อมูล OT
+                const response = await fetch(`${API_BASE_URL}/getOvertimes`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูล OT ได้');
+                
+                const allOvertimes = await response.json();
+                
+                // กรองเฉพาะ OT ในเดือนที่เลือก
+                overtimesData = allOvertimes.filter(ot => {
+                    const otDate = new Date(ot.shift_date);
+                    const startDateObj = new Date(startDate);
+                    const endDateObj = new Date(endDate);
+                    return otDate >= startDateObj && otDate <= endDateObj;
+                });
+                
+                // แสดงข้อมูล OT และคำนวณสรุป
+                displayOvertimes(overtimesData);
+                calculateSummary(overtimesData);
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูล OT:', error);
+                document.getElementById('overtimesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i> ไม่สามารถโหลดข้อมูล OT ได้ กรุณาลองใหม่อีกครั้ง
+                        </td>
+                    </tr>
+                `;
+                
+                // กำหนดค่าเริ่มต้นให้กับสรุป
+                document.getElementById('totalOTHours').textContent = '0';
+                document.getElementById('totalOTPayment').textContent = '0';
+                document.getElementById('avgOTPerPerson').textContent = '0';
+            }
+        }
+        
+        // แสดงข้อมูล OT ในตาราง
+        function displayOvertimes(overtimes) {
+            const tbody = document.getElementById('overtimesTableBody');
+            
+            if (overtimes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <i class="fas fa-info-circle me-2"></i> ไม่พบข้อมูล OT ในช่วงเวลานี้
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            overtimes.forEach(ot => {
+                const tr = document.createElement('tr');
+                
+                // จัดรูปแบบวันที่
+                const otDate = new Date(ot.shift_date);
+                const formattedDate = otDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // จัดรูปแบบเวลา
+                const startTime = ot.start_time.substring(0, 5);
+                const endTime = ot.end_time.substring(0, 5);
+                
+                // แปลงตำแหน่งเป็นภาษาไทย
+                const roleThai = ot.role === 'Doctor' ? 'แพทย์' : 'พยาบาล';
+                
+                // สถานะการจ่ายเงิน (จ่ายแล้ว/รอจ่าย)
+                // สมมติว่ามีฟิลด์ payment_status ใน API (อาจต้องเพิ่มในฐานข้อมูล)
+                const paymentStatus = ot.payment_status === 'Paid' 
+                    ? '<span class="status-badge paid">จ่ายแล้ว</span>' 
+                    : '<span class="status-badge pending">รอจ่าย</span>';
+                
+                tr.innerHTML = `
+                    <td>${ot.name}</td>
+                    <td>${ot.dept_name || '-'}</td>
+                    <td>${roleThai}</td>
+                    <td>${formattedDate}</td>
+                    <td>${startTime} - ${endTime}</td>
+                    <td>${ot.hours}</td>
+                    <td>${ot.rate.toLocaleString('th-TH')}</td>
+                    <td>${ot.total_payment.toLocaleString('th-TH')}</td>
+                    <td>${paymentStatus}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // คำนวณสรุปข้อมูล OT
+        function calculateSummary(overtimes) {
+            // คำนวณจำนวนชั่วโมง OT ทั้งหมด
+            const totalHours = overtimes.reduce((total, ot) => total + ot.hours, 0);
+            
+            // คำนวณค่าตอบแทน OT ทั้งหมด
+            const totalPayment = overtimes.reduce((total, ot) => total + ot.total_payment, 0);
+            
+            // คำนวณค่าเฉลี่ยชั่วโมง OT ต่อคน
+            const uniquePersons = new Set(overtimes.map(ot => ot.user_id));
+            const avgHoursPerPerson = uniquePersons.size > 0 ? totalHours / uniquePersons.size : 0;
+            
+            // แสดงผลลัพธ์
+            document.getElementById('totalOTHours').textContent = totalHours.toFixed(1);
+            document.getElementById('totalOTPayment').textContent = totalPayment.toLocaleString('th-TH');
+            document.getElementById('avgOTPerPerson').textContent = avgHoursPerPerson.toFixed(1);
+        }
+        
+        // กรองข้อมูล OT
+        function filterOvertimes() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const departmentId = document.getElementById('departmentFilter').value;
+            const role = document.getElementById('roleFilter').value;
+            
+            let filteredOvertimes = overtimesData;
+            
+            // กรองตามข้อความค้นหา
+            if (searchText) {
+                filteredOvertimes = filteredOvertimes.filter(ot => 
+                    ot.name.toLowerCase().includes(searchText)
+                );
+            }
+            
+            // กรองตามแผนก
+            if (departmentId) {
+                filteredOvertimes = filteredOvertimes.filter(ot => 
+                    ot.dept_id == departmentId
+                );
+            }
+            
+            // กรองตามตำแหน่ง
+            if (role) {
+                filteredOvertimes = filteredOvertimes.filter(ot => 
+                    ot.role === role
+                );
+            }
+            
+            // แสดงผลลัพธ์
+            displayOvertimes(filteredOvertimes);
+            calculateSummary(filteredOvertimes);
+        }
+        
+        // ส่งออกข้อมูล OT เป็นไฟล์ CSV
+        function exportOTData() {
+            // เตรียมข้อมูล
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // เพิ่มหัวตาราง
+            csvContent += "ชื่อ,แผนก,ตำแหน่ง,วันที่,เวลาเริ่ม,เวลาสิ้นสุด,จำนวนชั่วโมง OT,อัตราค่าจ้าง/ชม.,ค่าตอบแทนรวม,สถานะ\n";
+            
+            // เพิ่มข้อมูลแต่ละแถว
+            overtimesData.forEach(ot => {
+                // จัดรูปแบบวันที่
+                const otDate = new Date(ot.shift_date);
+                const formattedDate = otDate.toLocaleDateString('th-TH');
+                
+                // แปลงตำแหน่งเป็นภาษาไทย
+                const roleThai = ot.role === 'Doctor' ? 'แพทย์' : 'พยาบาล';
+                
+                // สถานะการจ่ายเงิน
+                const paymentStatus = ot.payment_status === 'Paid' ? 'จ่ายแล้ว' : 'รอจ่าย';
+                
+                // เพิ่มข้อมูลลงใน CSV
+                csvContent += `${ot.name},${ot.dept_name || '-'},${roleThai},${formattedDate},${ot.start_time},${ot.end_time},${ot.hours},${ot.rate},${ot.total_payment},${paymentStatus}\n`;
+            });
+            
+            // สร้างลิงก์ดาวน์โหลด
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "overtime_data.csv");
+            document.body.appendChild(link);
+            
+            // คลิกลิงก์เพื่อดาวน์โหลด
+            link.click();
+            
+            // ลบลิงก์
+            document.body.removeChild(link);
+        }
+        
+        // อัพเดตอัตราค่าจ้างตามตำแหน่ง
+        function updateRateByRole() {
+            const role = document.getElementById('calculatorRole').value;
+            let defaultRate = 0;
+            
+            // กำหนดอัตราค่าจ้างเริ่มต้นตามตำแหน่ง
+            if (role === 'Doctor') {
+                defaultRate = 500; // 500 บาทต่อชั่วโมงสำหรับแพทย์
+            } else if (role === 'Nurse') {
+                defaultRate = 300; // 300 บาทต่อชั่วโมงสำหรับพยาบาล
+            }
+            
+            // กำหนดค่าให้กับ input อัตราค่าจ้าง
+            document.getElementById('calculatorRate').value = defaultRate;
+        }
+        
+        // คำนวณ OT ด้วยเครื่องคำนวณ
+        function calculateOT() {
+            // ดึงข้อมูลจากฟอร์ม
+            const role = document.getElementById('calculatorRole').value;
+            const hours = parseFloat(document.getElementById('calculatorHours').value);
+            const rate = parseFloat(document.getElementById('calculatorRate').value);
+            
+            // ตรวจสอบข้อมูล
+            if (!role || isNaN(hours) || isNaN(rate)) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            // คำนวณค่าตอบแทน
+            const totalPayment = hours * rate;
+            
+            // แสดงผลลัพธ์
+            document.getElementById('resultRole').textContent = role === 'Doctor' ? 'แพทย์' : 'พยาบาล';
+            document.getElementById('resultHours').textContent = hours.toFixed(1) + ' ชั่วโมง';
+            document.getElementById('resultRate').textContent = rate.toLocaleString('th-TH') + ' บาท';
+            document.getElementById('resultTotal').textContent = totalPayment.toLocaleString('th-TH') + ' บาท';
+            
+            // แสดงผลลัพธ์
+            document.getElementById('calculatorResult').style.display = 'block';
+        }
+        
+        // อัพเดตจำนวนคำขอเปลี่ยนเวรที่รอดำเนินการ
+        async function updatePendingRequestsCount() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลคำขอได้');
+                
+                const requests = await response.json();
+                
+                // นับจำนวนคำขอที่มีสถานะ 'Pending'
+                const pendingCount = requests.filter(req => req.status === 'Pending').length;
+                
+                // อัพเดต badge
+                const badge = document.getElementById('pendingRequestsCount');
+                badge.textContent = pendingCount;
+                
+                // ซ่อน badge ถ้าไม่มีคำขอที่รอดำเนินการ
+                if (pendingCount === 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดข้อมูลคำขอ:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

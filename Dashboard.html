@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hospital Shift Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Hover.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #7269ef, #4776e6);
+            --secondary-gradient: linear-gradient(120deg, #00c6ff, #0072ff);
+            --success-gradient: linear-gradient(120deg, #05c075, #01a75a);
+            --danger-gradient: linear-gradient(120deg, #ff6b6b, #ee0979);
+            --warning-gradient: linear-gradient(120deg, #f7b733, #fc4a1a);
+            --info-gradient: linear-gradient(120deg, #0093e9, #80d0c7);
+            --sidebar-color: #2b343b;
+            --dark-glass: rgba(0, 0, 0, 0.5);
+            --light-glass: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --neon-accent: 0 0 10px rgba(0, 123, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: var(--shadow-glass);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-glass), var(--neon-accent);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            width: 280px;
+            z-index: 1040;
+            overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .sidebar-brand span {
+            color: #4776e6;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .menu-header {
+            padding: 10px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4776e6;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu .badge {
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            border-radius: 15px;
+            color: white;
+            padding: 25px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card.primary {
+            background: var(--primary-gradient);
+        }
+
+        .stat-card.success {
+            background: var(--success-gradient);
+        }
+
+        .stat-card.warning {
+            background: var(--warning-gradient);
+        }
+
+        .stat-card.danger {
+            background: var(--danger-gradient);
+        }
+
+        .stat-card .stat-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 60px;
+            opacity: 0.2;
+        }
+
+        .stat-card .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Charts */
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .chart-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Top Performer */
+        .top-performer {
+            background: var(--warning-gradient);
+            border-radius: 15px;
+            color: white;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(252, 74, 26, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(252, 74, 26, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(252, 74, 26, 0);
+            }
+        }
+
+        .top-performer .performer-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .top-performer .performer-hours {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .top-performer .trophy-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 40px;
+        }
+
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .table-card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* User Profile */
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-profile .user-info {
+            line-height: 1.2;
+        }
+
+        .user-profile .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .user-profile .user-role {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* Month Selector */
+        .month-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .month-selector select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 10px 30px 10px 15px;
+            font-size: 14px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .month-selector select:focus {
+            outline: none;
+            border-color: #4776e6;
+            box-shadow: 0 0 0 0.2rem rgba(71, 118, 230, 0.25);
+        }
+
+        .month-selector::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #495057;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #4776e6;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
+
+            .sidebar-brand h2 span {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 22px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stat-card .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-card .stat-label {
+                font-size: 14px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .top-navbar .user-profile {
+                margin-top: 10px;
+            }
+        }
+
+        /* Utilities */
+        .btn-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1030;
+            transition: all 0.3s;
+        }
+
+        .btn-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .bg-gradient-primary {
+            background: var(--primary-gradient);
+        }
+
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-hospital-user"></i> <span>HSMS</span></h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-header">เมนูหลัก</div>
+            <ul>
+                <li>
+                    <a href="#" class="active hvr-sweep-to-right">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>จัดการเวร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-clock"></i>
+                        <span>คำนวณ OT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>คำขอเปลี่ยนเวร</span>
+                        <span class="badge bg-danger rounded-pill" id="pendingRequestsCount">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ข้อมูลทั่วไป</div>
+            <ul>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-user-md"></i>
+                        <span>บุคลากร</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-hospital"></i>
+                        <span>แผนก</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">รายงาน</div>
+            <ul>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>รายงานประจำเดือน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>รายงานประจำปี</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-header">ตั้งค่า</div>
+            <ul>
+                <li>
+                    <a href="#" class="hvr-sweep-to-right">
+                        <i class="fas fa-cog"></i>
+                        <span>ตั้งค่าระบบ</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h3 class="page-title animate__animated animate__fadeIn">Dashboard</h3>
+            <div class="d-flex align-items-center">
+                <div class="month-selector me-4">
+                    <select id="monthSelector" onchange="fetchDashboardData()">
+                        <option value="มกราคม 2025">มกราคม </option>
+                        <option value="กุมภาพันธ์ 2025">กุมภาพันธ์ </option>
+                        <option value="มีนาคม 2025">มีนาคม </option>
+                        <option value="เมษายน 2025">เมษายน </option>
+                        <option value="พฤษภาคม 2025">พฤษภาคม </option>
+                        <option value="มิถุนายน 2025">มิถุนายน </option>
+                        <option value="กรกฎาคม 2025">กรกฎาคม </option>
+                        <option value="สิงหาคม 2025">สิงหาคม </option>
+                        <option value="กันยายน 2025">กันยายน </option>
+                        <option value="ตุลาคม 2025">ตุลาคม </option>
+                        <option value="พฤศจิกายน 2025">พฤศจิกายน </option>
+                        <option value="ธันวาคม 2025">ธันวาคม </option>
+                    </select>
+                </div>
+                <div class="user-profile">
+                    <img src="/api/placeholder/45/45" alt="Admin Profile">
+                    <div class="user-info">
+                        <div class="user-name">แอดมิน</div>
+                        <div class="user-role">ผู้ดูแลระบบ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="container-fluid px-0">
+            <!-- Stats Row -->
+            <div class="row animate__animated animate__fadeInUp">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stat-card primary">
+                        <div class="stat-value" id="totalShifts">0</div>
+                        <div class="stat-label">จำนวนเวรทั้งหมด</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stat-card success">
+                        <div class="stat-value" id="totalOTHours">0</div>
+                        <div class="stat-label">ชั่วโมง OT รวม</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stat-card warning">
+                        <div class="stat-value" id="averageOTPerPerson">0</div>
+                        <div class="stat-label">ค่าเฉลี่ย OT ต่อคน</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stat-card danger">
+                        <div class="stat-value" id="pendingRequestsCard">0</div>
+                        <div class="stat-label">คำขอรอดำเนินการ</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="col-lg-8 mb-4">
+                    <div class="chart-card">
+                        <div class="card-title">จำนวน OT ของแพทย์และพยาบาลแต่ละคนต่อเดือน</div>
+                        <div class="chart-container" id="staffOTChartContainer">
+                            <div class="loading" id="staffOTChartLoading">
+                                <div class="loading-spinner"></div>
+                            </div>
+                            <canvas id="staffOTChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="chart-card">
+                        <div class="card-title">สัดส่วน OT ของแต่ละแผนก</div>
+                        <div class="chart-container" id="departmentOTChartContainer">
+                            <div class="loading" id="departmentOTChartLoading">
+                                <div class="loading-spinner"></div>
+                            </div>
+                            <canvas id="departmentOTChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <!-- Latest Shifts Table -->
+                <div class="col-lg-8 mb-4">
+                    <div class="table-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="card-title">เวรล่าสุด</div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">ดูทั้งหมด <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>ชื่อ</th>
+                                        <th>แผนก</th>
+                                        <th>วันที่</th>
+                                        <th>เวลา</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="latestShiftsTable">
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <div class="loading">
+                                                <div class="loading-spinner"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Performer & Requests -->
+                <div class="col-lg-4 mb-4">
+                    <!-- Top Performer Card -->
+                    <div class="glass-card mb-4">
+                        <h5 class="card-title mb-3">บุคลากรที่มี OT สูงสุด</h5>
+                        <div class="top-performer">
+                            <div class="trophy-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="performer-name" id="highestOTPerson">-</div>
+                            <div class="performer-hours">ชั่วโมง OT: <span id="highestOTHours">0</span></div>
+                            <div class="mt-2">
+                                <span class="badge bg-warning">พนักงานดีเด่นประจำเดือน</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Requests Card -->
+                    <div class="glass-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">คำขอเปลี่ยนเวรล่าสุด</h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
+                        </div>
+                        <div id="latestRequests">
+                            <div class="loading">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Float Button for Quick Actions -->
+    <button class="btn btn-float bg-gradient-primary text-white">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Global chart variables
+        let staffOTChart = null;
+        let departmentOTChart = null;
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // Init function when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchDashboardData();
+        });
+
+        // Fetch all data for dashboard
+        async function fetchDashboardData() {
+            const selectedMonth = document.getElementById('monthSelector').value;
+            
+            try {
+                // Fetch data in parallel for better performance
+                await Promise.all([
+                    fetchMonthlyStats(selectedMonth),
+                    fetchStaffOT(selectedMonth),
+                    fetchDepartmentOT(selectedMonth),
+                    fetchLatestShifts(),
+                    fetchPendingRequests()
+                ]);
+                
+                console.log('All dashboard data loaded successfully');
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // Fetch monthly statistics
+        async function fetchMonthlyStats(month) {
+            try {
+                document.getElementById('totalShifts').textContent = '...';
+                document.getElementById('totalOTHours').textContent = '...';
+                document.getElementById('averageOTPerPerson').textContent = '...';
+                document.getElementById('highestOTPerson').textContent = '...';
+                document.getElementById('highestOTHours').textContent = '...';
+
+                const response = await fetch(`${API_BASE_URL}/getMonthlyStats?month=${month}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch monthly stats');
+                }
+
+                const data = await response.json();
+                document.getElementById('totalShifts').textContent = data.totalShifts || 0;
+                document.getElementById('totalOTHours').textContent = data.totalOTHours || 0;
+                document.getElementById('averageOTPerPerson').textContent = data.averageOTPerPerson || 0;
+                document.getElementById('highestOTPerson').textContent = data.highestOTPerson || '-';
+                document.getElementById('highestOTHours').textContent = data.highestOTHours || 0;
+
+                console.log('Monthly stats loaded successfully');
+            } catch (error) {
+                console.error('Error fetching monthly stats:', error);
+                // Set default values in case of error to ensure UI is not broken
+                document.getElementById('totalShifts').textContent = '0';
+                document.getElementById('totalOTHours').textContent = '0';
+                document.getElementById('averageOTPerPerson').textContent = '0';
+                document.getElementById('highestOTPerson').textContent = '-';
+                document.getElementById('highestOTHours').textContent = '0';
+            }
+        }
+
+        // Fetch staff OT data for bar chart
+        async function fetchStaffOT(month) {
+            try {
+                // Show loading indicator
+                document.getElementById('staffOTChartLoading').style.display = 'flex';
+                
+                const response = await fetch(`${API_BASE_URL}/getStaffOT?month=${month}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch staff OT data');
+                }
+
+                const data = await response.json();
+                
+                // Hide loading indicator
+                document.getElementById('staffOTChartLoading').style.display = 'none';
+                
+                renderStaffOTChart(data);
+                console.log('Staff OT data loaded successfully');
+            } catch (error) {
+                console.error('Error fetching staff OT data:', error);
+                document.getElementById('staffOTChartLoading').style.display = 'none';
+                document.getElementById('staffOTChartContainer').innerHTML = '<div class="alert alert-danger">ไม่สามารถโหลดข้อมูลได้</div>';
+            }
+        }
+
+        // Fetch department OT data for pie chart
+        async function fetchDepartmentOT(month) {
+            try {
+                // Show loading indicator
+                document.getElementById('departmentOTChartLoading').style.display = 'flex';
+                
+                const response = await fetch(`${API_BASE_URL}/getDepartmentOT?month=${month}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch department OT data');
+                }
+
+                const data = await response.json();
+                
+                // Hide loading indicator
+                document.getElementById('departmentOTChartLoading').style.display = 'none';
+                
+                renderDepartmentOTChart(data);
+                console.log('Department OT data loaded successfully');
+            } catch (error) {
+                console.error('Error fetching department OT data:', error);
+                document.getElementById('departmentOTChartLoading').style.display = 'none';
+                document.getElementById('departmentOTChartContainer').innerHTML = '<div class="alert alert-danger">ไม่สามารถโหลดข้อมูลได้</div>';
+            }
+        }
+
+        // Fetch latest shifts data
+        async function fetchLatestShifts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getShifts`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch latest shifts data');
+                }
+
+                const data = await response.json();
+                renderLatestShifts(data.slice(0, 5)); // Show only 5 latest shifts
+                console.log('Latest shifts data loaded successfully');
+            } catch (error) {
+                console.error('Error fetching latest shifts data:', error);
+                const tableBody = document.getElementById('latestShiftsTable');
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">ไม่สามารถโหลดข้อมูลได้</td></tr>';
+            }
+        }
+
+        // Fetch pending requests data
+        async function fetchPendingRequests() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getRequests`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch requests data');
+                }
+
+                const data = await response.json();
+                
+                // Filter pending requests
+                const pendingRequests = data.filter(req => req.status === 'Pending');
+                
+                // Update UI with count of pending requests
+                document.getElementById('pendingRequestsCount').textContent = pendingRequests.length;
+                document.getElementById('pendingRequestsCard').textContent = pendingRequests.length;
+                
+                // Render latest requests
+                renderLatestRequests(data.slice(0, 3)); // Show only 3 latest requests
+                console.log('Requests data loaded successfully');
+            } catch (error) {
+                console.error('Error fetching requests data:', error);
+                document.getElementById('pendingRequestsCount').textContent = '0';
+                document.getElementById('pendingRequestsCard').textContent = '0';
+                document.getElementById('latestRequests').innerHTML = '<div class="alert alert-danger">ไม่สามารถโหลดข้อมูลได้</div>';
+            }
+        }
+
+        // Render staff OT chart
+        function renderStaffOTChart(data) {
+            // Destroy existing chart if it exists
+            if (staffOTChart) {
+                staffOTChart.destroy();
+            }
+
+            const ctx = document.getElementById('staffOTChart').getContext('2d');
+            
+            // Prepare chart data
+            const labels = data.map(item => item.name);
+            const values = data.map(item => item.hours);
+            const colors = data.map(item => item.role === 'Doctor' ? '#4776e6' : '#05c075');
+            
+            // Create new chart
+            staffOTChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ชั่วโมง OT',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color === '#4776e6' ? '#3a5fc9' : '#049d5f'),
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw} ชั่วโมง`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'จำนวนชั่วโมง OT'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Render department OT chart
+        function renderDepartmentOTChart(data) {
+            // Destroy existing chart if it exists
+            if (departmentOTChart) {
+                departmentOTChart.destroy();
+            }
+
+            const ctx = document.getElementById('departmentOTChart').getContext('2d');
+            
+            // Prepare chart data
+            const labels = data.map(item => item.name);
+            const values = data.map(item => item.value);
+            const colors = [
+                '#4776e6', '#05c075', '#f7b733', '#e74c3c', '#9b59b6', 
+                '#1abc9c', '#3498db', '#e67e22', '#27ae60', '#2c3e50'
+            ];
+            
+            // Create new chart
+            departmentOTChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} ชั่วโมง (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Render latest shifts table
+        function renderLatestShifts(shifts) {
+            const tableBody = document.getElementById('latestShiftsTable');
+            
+            if (!shifts || shifts.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">ไม่พบข้อมูลเวรล่าสุด</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            
+            shifts.forEach(shift => {
+                const row = document.createElement('tr');
+                
+                // Format date
+                const shiftDate = new Date(shift.shift_date);
+                const formattedDate = shiftDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                // Format time
+                const startTime = shift.start_time.substring(0, 5);
+                const endTime = shift.end_time.substring(0, 5);
+                
+                // Create status badge
+                let statusHtml = '';
+                if (shift.is_overtime) {
+                    statusHtml = '<span class="status-badge approved">OT</span>';
+                } else {
+                    statusHtml = '<span class="status-badge pending">ปกติ</span>';
+                }
+                
+                row.innerHTML = `
+                    <td><b>${shift.name}</b></td>
+                    <td>${shift.dept_name || '-'}</td>
+                    <td>${formattedDate}</td>
+                    <td>${startTime} - ${endTime}</td>
+                    <td>${statusHtml}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Render latest requests
+        function renderLatestRequests(requests) {
+            const container = document.getElementById('latestRequests');
+            
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<div class="text-center p-3">ไม่พบคำขอเปลี่ยนเวรล่าสุด</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            requests.forEach(request => {
+                // Format date
+                const shiftDate = new Date(request.shift_date);
+                const formattedDate = shiftDate.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                // Create status badge
+                let statusBadgeClass = '';
+                switch (request.status) {
+                    case 'Pending':
+                        statusBadgeClass = 'pending';
+                        break;
+                    case 'Approved':
+                        statusBadgeClass = 'approved';
+                        break;
+                    case 'Rejected':
+                        statusBadgeClass = 'rejected';
+                        break;
+                    default:
+                        statusBadgeClass = 'pending';
+                }
+                
+                const requestItem = document.createElement('div');
+                requestItem.className = 'card p-3 mb-2 border-0 shadow-sm animate__animated animate__fadeIn';
+                requestItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">${request.name}</h6>
+                            <small class="text-muted">${formattedDate}</small>
+                        </div>
+                        <span class="status-badge ${statusBadgeClass}">${request.status}</span>
+                    </div>
+                `;
+                
+                container.appendChild(requestItem);
+            });
+        }
+    </script>
+</body>
+
+</html>
